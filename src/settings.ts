@@ -19,6 +19,11 @@ export default function(context: vscode.ExtensionContext){
         },
         saveDomain: (domain: string) => {
             context.globalState.update('domain', { domain: domain });
+        },
+        clearAll: () => {
+            var clearCred = context.globalState.update('cred', undefined);
+            var clearDomain = context.globalState.update('domain', undefined);
+            return Promise.all([clearCred, clearDomain]);
         }
     }
 }

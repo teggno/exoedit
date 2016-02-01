@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'; 
 import {downloadPortalWidgetScript, downloadDomainWidgetScript} from './editWidgetScript';
-import changeUser from './changeUser';
+import settings from './settings';
 import {uploadPortalWidgetScript, uploadDomainWidgetScript} from './uploadWidgetScript';
 import { isDocumentEmpty } from './vscodeUtilities';
 
@@ -18,7 +18,12 @@ export default function(context: vscode.ExtensionContext){
             fn: () => { uploadPortalWidgetScript(context);}, 
             condition: hasActiveTextEditorWithContent 
         },
-        { title: 'Change User', fn: () => { changeUser(context);} }
+        { 
+            title: 'Clear User and Domain', 
+            fn: () => { 
+                settings(context).clearAll().then(() => vscode.window.showInformationMessage('Successfully cleared user and domain'));
+            } 
+        }
     ];
     
     return actions.filter((a: any) => !a.condition || a.condition());     

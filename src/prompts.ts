@@ -184,5 +184,6 @@ function getDomain(ds: DomainSettings){
                 return domain;
             });
     }
-    return Promise.resolve(ds.getDomain());
+    console.log('Using domain "' + domain + '"');
+    return Promise.resolve(domain);
 }

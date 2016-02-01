@@ -28,3 +28,8 @@ exists on a Portal Dashboard.
 When you have selected this command, you will be prompted for the Portal, the Dashboard and the Widget.
 
 **NOTE: This command is only available if there is an active editor window that contains something.** 
+
+### Clear User and Domain
+When you use one of the commands mentioned above, you will be prompted for your credentials and a domain
+which will be stored for subsequent use.
+In case you need to change any of them, you can select the "Clear User and Domain" command.
