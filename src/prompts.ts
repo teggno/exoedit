@@ -6,14 +6,14 @@ import {showObjectQuickPick} from './vscodeUtilities';
 import Exosite from './exosite';
 import * as domainModel from  './domainModel';
 
-export function promptForPortalWidget(context: vscode.ExtensionContext): Thenable<domainModel.PortalWidgetScript>{
+export function promptForPortalWidget(context: vscode.ExtensionContext){
     return promptForPortal(context)
         .then(portal => portal.getDashboardsContainingPortalWidget())
         .then(dashboards => showObjectQuickPick(dashboards, d => d.name, {placeHolder: 'Dashboards'}))
         .then(dashboard => showObjectQuickPick(dashboard.portalWidgets, w => w.getWidgetTitle(), {placeHolder: 'Widgets'}));
 }
 
-export function promptForDomainWidget(context: vscode.ExtensionContext): Thenable<domainModel.DomainWidgetScript>{
+export function promptForDomainWidget(context: vscode.ExtensionContext){
     return promptForDomain(context)
         .then(domain => domain.getDomainWidgetScripts())
         .then(domainWidgetScripts => showObjectQuickPick(domainWidgetScripts, w => w.getWidgetTitle(), {placeHolder: 'Widgets'}));
@@ -27,7 +27,7 @@ export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Then
         .then(luaScripts => showObjectQuickPick(luaScripts, s=> s.name, {placeHolder: 'Widgets'}));
 }
 
-function promptForPortal(context: vscode.ExtensionContext): Thenable<domainModel.Portal>{
+function promptForPortal(context: vscode.ExtensionContext){
     var sti = settings(context);
     var savedAccount = sti.getCredentials();
     var getAccount = savedAccount 
