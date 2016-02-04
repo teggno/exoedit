@@ -108,6 +108,30 @@ export default class{
             });
     }
 
+    public getDevices(portalId: string): Thenable<Device[]>{
+        var options = {
+            auth: this.account, 
+            url: this.getUrl('portals/' + portalId + '/devices')
+        };
+        return fetch(options)
+            .then(expectStatus200)
+            .then(result => {
+                return JSON.parse(result.body);
+            });
+    }
+    
+    public getDeviceLuaScripts(deviceRid: string): Thenable<LuaScript[]>{
+        var options = {
+            auth: this.account, 
+            url: this.getUrl('devices/' + deviceRid + '/scripts')
+        };
+        return fetch(options)
+            .then(expectStatus200)
+            .then(result => {
+                return JSON.parse(result.body);
+            });
+    }
+    
     private getUrl(suffix:string){
         return concatWithSlash('https://' + this.domain, concatWithSlash('api/portals/v1', suffix));
     }
@@ -138,4 +162,26 @@ export interface DomainWidgetScript{
     description: string,
     id: string,
     name: string
+}
+
+export interface Device{
+    rid: string;
+    info: {
+        description: {
+            name: string;
+        }
+    }
+    sn: string;
+}
+
+export interface LuaScript{
+    rid: string,
+    info: {
+        description: {
+            name: string;
+            rule: {
+                script: string;
+            }
+        }
+    }
 }

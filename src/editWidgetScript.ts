@@ -1,31 +1,19 @@
 import * as vscode from 'vscode'; 
-import { hasWorkspace, activateNewUntitledFile, hasActiveTextEditorUntitledEmptyFile } from './vscodeUtilities';
+import { showTextInEditor } from './vscodeUtilities';
 import { promptForPortalWidget, promptForDomainWidget } from './prompts';
+import { ScriptSource } from './domainModel';
 
 export function downloadPortalWidgetScript(context: vscode.ExtensionContext){
-    promptForPortalWidget(context)
-        .then(scriptSource => {
-            return scriptSource.getScript();
-        })
-        .then(showScriptInEditor)
-        .then(null, error => { console.error(error)});
+    downloadScript(() => promptForPortalWidget(context));
 }
 
 export function downloadDomainWidgetScript(context: vscode.ExtensionContext){
-    promptForDomainWidget(context)
-        .then(scriptSource => {
-            return scriptSource.getScript();
-        })
-        .then(showScriptInEditor)
-        .then(null, error => { console.error(error)});
+    downloadScript(() => promptForDomainWidget(context));
 }
 
-function showScriptInEditor(script: string): Thenable<void>{
-    var prepareEditor:any  = hasActiveTextEditorUntitledEmptyFile()
-        ? Promise.resolve()
-        : activateNewUntitledFile();
-    
-    return prepareEditor.then(() => {
-        return vscode.window.activeTextEditor.edit(x => x.insert(new vscode.Position(0, 0), script));                           
-    });
+function downloadScript(prompt: () => Thenable<ScriptSource>){
+    prompt()
+        .then(scriptSource => scriptSource.getScript())
+        .then(showTextInEditor)
+        .then(null, error => { console.error(error)});    
 }

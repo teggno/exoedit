@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'; 
-import { promptForDomainWidget, promptForPortalWidget, ScriptSource} from './prompts';
+import { promptForDomainWidget, promptForPortalWidget } from './prompts';
+import { ScriptSource } from './foo';
 
 export function uploadDomainWidgetScript(context: vscode.ExtensionContext){
     uploadScript(() => promptForDomainWidget(context));

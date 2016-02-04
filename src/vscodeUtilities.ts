@@ -37,3 +37,13 @@ export function hasActiveTextEditorUntitledEmptyFile(){
 export function isDocumentEmpty(document: vscode.TextDocument){
     return document.getText() === '';
 }
+
+export function showTextInEditor(text: string): Thenable<void>{
+    var prepareEditor:any  = hasActiveTextEditorUntitledEmptyFile()
+        ? Promise.resolve()
+        : activateNewUntitledFile();
+    
+    return prepareEditor.then(() => {
+        return vscode.window.activeTextEditor.edit(x => x.insert(new vscode.Position(0, 0), text));                           
+    });
+}

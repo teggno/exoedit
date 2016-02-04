@@ -4,169 +4,62 @@ import {Account} from './settings';
 import changeUser from './changeUser';
 import {showObjectQuickPick} from './vscodeUtilities';
 import Exosite from './exosite';
-import * as api from './exosite';
+import * as domainModel from  './domainModel';
 
-export function promptForPortalWidget(context: vscode.ExtensionContext): Thenable<ScriptSource>{
+export function promptForPortalWidget(context: vscode.ExtensionContext): Thenable<domainModel.PortalWidgetScript>{
+    return promptForPortal(context)
+        .then(portal => portal.getDashboardsContainingPortalWidget())
+        .then(dashboards => showObjectQuickPick(dashboards, d => d.name, {placeHolder: 'Dashboards'}))
+        .then(dashboard => showObjectQuickPick(dashboard.portalWidgets, w => w.getWidgetTitle(), {placeHolder: 'Widgets'}));
+}
+
+export function promptForDomainWidget(context: vscode.ExtensionContext): Thenable<domainModel.DomainWidgetScript>{
+    return promptForDomain(context)
+        .then(domain => domain.getDomainWidgetScripts())
+        .then(domainWidgetScripts => showObjectQuickPick(domainWidgetScripts, w => w.getWidgetTitle(), {placeHolder: 'Widgets'}));
+}
+
+export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Thenable<domainModel.LuaScript>{
+    return promptForPortal(context)
+        .then(portal => portal.getDevices())
+        .then(devices => showObjectQuickPick(devices, d => d.name, {placeHolder: 'Device'}))
+        .then(device => device.getLuaScripts())
+        .then(luaScripts => showObjectQuickPick(luaScripts, s=> s.name, {placeHolder: 'Widgets'}));
+}
+
+function promptForPortal(context: vscode.ExtensionContext): Thenable<domainModel.Portal>{
+    var sti = settings(context);
+    var savedAccount = sti.getCredentials();
+    var getAccount = savedAccount 
+        ? Promise.resolve(savedAccount)
+        : changeUser(context);
+
+    var domain: domainModel.Domain;
+    
+    return promptForDomain(context)
+        .then(dom => {
+            domain = dom;
+            return getAccount;
+        })
+        .then(acc => new Exosite(domain.name, acc).getExositeAccount())
+        .then(exositeAccount => domain.getPortalsByUserId(exositeAccount.id))
+        .then(portals => showObjectQuickPick(portals, p => p.name, {placeHolder: 'Portals'}));
+}
+
+function promptForDomain(context: vscode.ExtensionContext){
     var sti = settings(context);
     var savedAccount = sti.getCredentials();
     var getAccount = savedAccount 
         ? Promise.resolve(savedAccount)
         : changeUser(context);
         
-    var exosite: Exosite;
-    var account: Account;
-    var dashboard: api.Dashboard;
-    
-    return getAccount.then(acc => {
-            account = acc;
-            return getDomain(sti);
-        })
-        .then(domain => {
-            return new Exosite(domain, account)
-        })
-        .then(exo => {
-            exosite = exo;
-            return exosite.getExositeAccount();
-        })
-        .then(exositeAccount => {
-            return exosite.getPortals(exositeAccount.id);
-        })
-        .then(portals => {
-            return showObjectQuickPick(portals, p => p.PortalName, {placeHolder: 'Portals'});
-        })
-        .then(portal => {
-            return exosite.getDashboards(portal.PortalID);
-        })
-        .then(dashboards => {
-            var dashboardsWithPortalWidgetsOnly = getDashboardsContainingPortalWidget(dashboards, exosite);
-            return showObjectQuickPick(dashboardsWithPortalWidgetsOnly, d => d.name, {placeHolder: 'Dashboards'});
-        })
-        .then(db => {
-            return showObjectQuickPick(db.portalWidgets, w => w.getWidgetTitle(), {placeHolder: 'Widgets'});
-        });
-}
-
-function getDashboardsContainingPortalWidget(dashboards: api.Dashboard[], exosite: Exosite){
-    var result = dashboards.map(db => {
-        var sourceWidgets = db.config.widgets;
-        var portalWidgets: PortalWidgetScript[] = [];
-        for(var id in sourceWidgets){
-            var widget = db.config.widgets[id];
-            if(widget.WidgetScriptID === null){
-                portalWidgets.push(new PortalWidgetScript(widget, db.id, exosite));
-            }
-        }
-        if(portalWidgets.length !== 0){
-            return {
-                portalWidgets: portalWidgets,
-                name: db.name,
-                id: db.id
-            }
-        }
-    }).filter(i => !!i);
-    return result;
-}
-
-export function promptForDomainWidget(context: vscode.ExtensionContext): Thenable<ScriptSource>{
-    var sti = settings(context);
-    var savedAccount = sti.getCredentials();
-    var getAccount = savedAccount 
-        ? Promise.resolve(savedAccount)
-        : changeUser(context);
-        
-    var exosite: Exosite;
     var account: Account;
     
     return getAccount.then(acc => {
             account = acc;
-            return getDomain(sti);
+            return getDomainName(sti);
         })
-        .then(domain => {
-            exosite = new Exosite(domain, account)
-            return exosite.getDomainWidgetScripts();
-        })
-        .then(domainWidgetScripts => {
-            return showObjectQuickPick(domainWidgetScripts, w => w.name, {placeHolder: 'Widgets'});
-        })
-        .then(domainWidgetScript => domainWidgetScript ? new DomainWidgetScript(domainWidgetScript, exosite) : null);
-}
-
-export interface ScriptSource{
-    getScript: () => Thenable<string>,
-    getExositeReference: () => string;
-    upload: (newScript: string) => Thenable<void>;
-    getWidgetTitle(): string;
-}
-
-class DomainWidgetScript implements ScriptSource{
-    constructor(private widget: api.DomainWidgetScript, private exosite: Exosite) {
-    }
-    
-    public getWidgetTitle(){
-        return this.widget.name;
-    }
-
-    public getScript(){
-        return this.getWidgetScriptObject().then(so => so.code);
-    }
-    
-    public getExositeReference(){
-        return this.widget.id;
-    }
-    
-    public upload(newScript: string){
-        return this.getWidgetScriptObject()
-            .then(so => {
-                so.code = newScript;
-                this.exosite.updateDomainWidgetScript(this.widget.id, so)
-            });
-    }
-    
-    private getWidgetScriptObject(){
-        return this.exosite.getDomainWidgetScript(this.widget.id);        
-    }
-}
-
-class PortalWidgetScript implements ScriptSource{
-    constructor(private widget: api.DashboardWidget, private dashboardId: string, private exosite: Exosite) {
-    }
-    
-    public getWidgetTitle(){
-        return this.widget.title;
-    }
-    
-    public getScript(){
-        return Promise.resolve(this.widget.script);
-    }
-    
-    public getExositeReference(){
-        return 'portal';
-    }
-
-    public upload(newScript: string){
-        return this.exosite.getDashboard(this.dashboardId)
-            .then(dashboard => {
-                return new Promise<void>((resolve, reject) => {
-                    var widgetTitle = this.widget.title;
-                    var index = this.findWidgetIndexByTitle(dashboard,  widgetTitle);
-                    if(index === -1) return reject('Portal widget with Name "' + widgetTitle +'" not found in dashboard "' + dashboard.name + '"');
-                    
-                    dashboard.config.widgets[index].script = newScript;
-                    this.exosite.updateDashboard(dashboard.id, { config: dashboard.config }).then(() => resolve());            
-                });
-        });
-    }
-
-    private findWidgetIndexByTitle(dashboard: api.Dashboard, title: string){
-        var widgets = dashboard.config.widgets;
-        for(var id in widgets){
-            var widget = widgets[id];
-            if(widget.title === title && !widget.WidgetScriptID){
-                return id;
-            }
-        }
-        return -1;
-    }
+        .then(domainName => new domainModel.Domain(domainName, new Exosite(domainName, account)));
 }
 
 interface DomainSettings{
@@ -174,7 +67,7 @@ interface DomainSettings{
     saveDomain: (domain: string) => void
 }
 
-function getDomain(ds: DomainSettings){
+function getDomainName(ds: DomainSettings){
     var domain = ds.getDomain();
     
     if(!domain){
