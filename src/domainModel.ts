@@ -126,7 +126,7 @@ export class PortalWidgetScript implements ScriptSource{
                 return new Promise<void>((resolve, reject) => {
                     var widgetTitle = this.widget.title;
                     var index = this.findWidgetIndexByTitle(dashboard,  widgetTitle);
-                    if(index === -1) return reject('Widget with Name "' + widgetTitle +'" not found in dashboard "' + dashboard.name + '"');
+                    if(index === -1) return reject(`Widget with Name "${widgetTitle}" not found in dashboard "${dashboard.name}"`);
                     
                     dashboard.config.widgets[index].script = newScript;
                     this.exosite.updateDashboard(dashboard.id, { config: dashboard.config }).then(() => resolve());            

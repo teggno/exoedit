@@ -41,18 +41,18 @@ function uploadScript(prompt: () => Thenable<ScriptSource>){
     const ok = 'OK';
     
     return prompt()
-        .then<ScriptSource|Promise<void>>(widget => widget ? widget : Promise.reject('No widget selected'))
-        .then((widget:ScriptSource) => {
+        .then<ScriptSource|Promise<void>>(scriptSource => scriptSource || Promise.reject('No script source selected'))
+        .then((scriptSource:ScriptSource) => {
             return vscode.window.showWarningMessage(
-                'The widget script of widget "' + widget.getTitle() + '" will be overwritten on Exosite.', ok)
+                `The widget script of "${scriptSource.getTitle()}" will be overwritten on Exosite.`, ok)
             .then(action => new Promise<ScriptSource>((resolve, reject) =>  {
                 if(action !== ok){
                    return reject('User decided not to upload anything');
                 }
-                resolve(widget);
+                resolve(scriptSource);
             }))
         })
-        .then(widget => widget.upload(vscode.window.activeTextEditor.document.getText()))
+        .then(scriptSource => scriptSource.upload(vscode.window.activeTextEditor.document.getText()))
         .then(() => vscode.window.showInformationMessage('Upload completed'))
         .then(null, error => console.error(error));
 }

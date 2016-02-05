@@ -26,7 +26,7 @@ export default function fetch(options: FetchOptions): Promise<{response: {status
                 reject(error);
                 return;
             }
-            console.log('http ' + newOptions.method + ' request completed');
+            console.log(`http ${newOptions.method} request completed`);
             resolve({response: response, body: body});
         }
         request(newOptions, callback);
@@ -45,7 +45,7 @@ interface ResponseAndBody{
 function expectStatus(...statuses: number[]){
     return expect(
         rb => rb.response && statuses.indexOf(rb.response.statusCode) === -1,
-        rb => 'Error: HTTP response status: ' + rb.response.statusCode
+        rb => `Error: HTTP response status: ${rb.response.statusCode}`
     );
 }
 

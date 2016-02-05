@@ -77,6 +77,6 @@ function getDomainName(ds: DomainSettings){
                 return domain;
             });
     }
-    console.log('Using domain "' + domain + '"');
+    console.log(`Using domain "${domain}"`);
     return Promise.resolve(domain);
 }
