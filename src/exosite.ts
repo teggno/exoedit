@@ -135,6 +135,27 @@ export default class{
     private getUrl(suffix:string){
         return concatWithSlash('https://' + this.domain, concatWithSlash('api/portals/v1', suffix));
     }
+
+    public updateLuaScript(rid: string, script: string){
+        var options = {
+            auth: this.account,
+            method: 'PUT', 
+            url: this.getUrl('scripts/' + rid),
+            json: true,
+            body: {
+                info:{
+                    description: {
+                        rule: {
+                            script: script
+                        }
+                    }
+                }
+            }
+        };
+        
+        return fetch(options)
+            .then(expectStatus200);    
+    }
 }
 
 export interface Portal{

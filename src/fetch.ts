@@ -15,10 +15,12 @@ interface FetchOptions {
 
 export default function fetch(options: FetchOptions): Promise<{response: {statusCode: number}, body: string}>{
     var auth = options.auth ? {user: options.auth.userName, pass: options.auth.password} : null;
+    var newOptions = <any>clone(options);
+    if(auth)newOptions.auth = auth;
+    if(!newOptions.method)newOptions.method = 'GET';
+
+    console.log(`Executing ${newOptions.method} to baseUrl ${newOptions.baseUrl || '-' }, url ${newOptions.url || '-'}`);
     return new Promise((resolve, reject) => {
-        var newOptions = <any>clone(options);
-        if(auth)newOptions.auth = auth;
-        if(!newOptions.method)newOptions.method = 'GET';
         var callback = (error, response, body: string) => {
             if(error){
                 reject(error);

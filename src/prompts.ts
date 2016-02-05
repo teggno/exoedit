@@ -9,14 +9,14 @@ import * as domainModel from  './domainModel';
 export function promptForPortalWidget(context: vscode.ExtensionContext){
     return promptForPortal(context)
         .then(portal => portal.getDashboardsContainingPortalWidget())
-        .then(dashboards => showObjectQuickPick(dashboards, d => d.name, {placeHolder: 'Dashboards'}))
-        .then(dashboard => showObjectQuickPick(dashboard.portalWidgets, w => w.getWidgetTitle(), {placeHolder: 'Widgets'}));
+        .then(dashboards => showObjectQuickPick(dashboards, d => d.name, {placeHolder: 'Dashboard'}))
+        .then(dashboard => showObjectQuickPick(dashboard.portalWidgets, w => w.getTitle(), {placeHolder: 'Widget'}));
 }
 
 export function promptForDomainWidget(context: vscode.ExtensionContext){
     return promptForDomain(context)
         .then(domain => domain.getDomainWidgetScripts())
-        .then(domainWidgetScripts => showObjectQuickPick(domainWidgetScripts, w => w.getWidgetTitle(), {placeHolder: 'Widgets'}));
+        .then(domainWidgetScripts => showObjectQuickPick(domainWidgetScripts, w => w.getTitle(), {placeHolder: 'Widget'}));
 }
 
 export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Thenable<domainModel.LuaScript>{
@@ -24,7 +24,7 @@ export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Then
         .then(portal => portal.getDevices())
         .then(devices => showObjectQuickPick(devices, d => d.name, {placeHolder: 'Device'}))
         .then(device => device.getLuaScripts())
-        .then(luaScripts => showObjectQuickPick(luaScripts, s=> s.name, {placeHolder: 'Widgets'}));
+        .then(luaScripts => showObjectQuickPick(luaScripts, s=> s.getTitle(), {placeHolder: 'Lua Script'}));
 }
 
 function promptForPortal(context: vscode.ExtensionContext){
@@ -43,7 +43,7 @@ function promptForPortal(context: vscode.ExtensionContext){
         })
         .then(acc => new Exosite(domain.name, acc).getExositeAccount())
         .then(exositeAccount => domain.getPortalsByUserId(exositeAccount.id))
-        .then(portals => showObjectQuickPick(portals, p => p.name, {placeHolder: 'Portals'}));
+        .then(portals => showObjectQuickPick(portals, p => p.name, {placeHolder: 'Portal'}));
 }
 
 function promptForDomain(context: vscode.ExtensionContext){

@@ -61,32 +61,25 @@ export class Device{
     
     getLuaScripts(){
         return this.exosite.getDeviceLuaScripts(this.rid)
-        .then(scripts => scripts.map(script => ({
-            name: script.info.description.name,
-            rid: script.rid,
-            script: script.info.description.rule.script
-        })));
+        .then(scripts => 
+            scripts.map(script => 
+                new LuaScript(script.info.description.name, script.rid, script.info.description.rule.script, this.exosite)));
     }
 }
 
-export interface LuaScript{
-    name: string,
-    rid: string,
-    script: string,
-}
 
 export interface ScriptSource{
     getScript: () => Thenable<string>,
     getExositeReference: () => string;
     upload: (newScript: string) => Thenable<void>;
-    getWidgetTitle(): string;
+    getTitle(): string;
 }
 
 export class DomainWidgetScript implements ScriptSource{
     constructor(private widget: api.DomainWidgetScript, private exosite: Exosite) {
     }
     
-    public getWidgetTitle(){
+    public getTitle(){
         return this.widget.name;
     }
 
@@ -115,7 +108,7 @@ export class PortalWidgetScript implements ScriptSource{
     constructor(private widget: api.DashboardWidget, private dashboardId: string, private exosite: Exosite) {
     }
     
-    public getWidgetTitle(){
+    public getTitle(){
         return this.widget.title;
     }
     
@@ -133,7 +126,7 @@ export class PortalWidgetScript implements ScriptSource{
                 return new Promise<void>((resolve, reject) => {
                     var widgetTitle = this.widget.title;
                     var index = this.findWidgetIndexByTitle(dashboard,  widgetTitle);
-                    if(index === -1) return reject('Portal widget with Name "' + widgetTitle +'" not found in dashboard "' + dashboard.name + '"');
+                    if(index === -1) return reject('Widget with Name "' + widgetTitle +'" not found in dashboard "' + dashboard.name + '"');
                     
                     dashboard.config.widgets[index].script = newScript;
                     this.exosite.updateDashboard(dashboard.id, { config: dashboard.config }).then(() => resolve());            
@@ -150,5 +143,26 @@ export class PortalWidgetScript implements ScriptSource{
             }
         }
         return -1;
+    }
+}
+
+export class LuaScript implements ScriptSource{
+    constructor(private name: string, private rid: string, private script: string, private exosite: Exosite) {
+    }
+    
+    public getTitle(){
+        return this.name;
+    }
+    
+    public getScript(){
+        return Promise.resolve(this.script);
+    }
+    
+    public getExositeReference(){
+        return this.rid;
+    }
+
+    public upload(newScript: string){
+        return this.exosite.updateLuaScript(this.rid, newScript).then(() => {return;});
     }
 }
