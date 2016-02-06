@@ -1,41 +1,43 @@
-import * as vscode from 'vscode'; 
-import settings from './settings';
-import {Account} from './settings';
-import changeUser from './changeUser';
-import {showObjectQuickPick} from './vscodeUtilities';
-import Exosite from './exosite';
-import * as domainModel from  './domainModel';
+"use strict";
 
-export function promptForPortalWidget(context: vscode.ExtensionContext){
+import * as vscode from "vscode";
+import settings from "./settings";
+import {Account} from "./settings";
+import changeUser from "./changeUser";
+import {showObjectQuickPick} from "./vscodeUtilities";
+import Exosite from "./exosite";
+import * as domainModel from  "./domainModel";
+
+export function promptForPortalWidget(context: vscode.ExtensionContext) {
     return promptForPortal(context)
         .then(portal => portal.getDashboardsContainingPortalWidget())
-        .then(dashboards => showObjectQuickPick(dashboards, d => d.name, {placeHolder: 'Dashboard'}))
-        .then(dashboard => showObjectQuickPick(dashboard.portalWidgets, w => w.getTitle(), {placeHolder: 'Widget'}));
+        .then(dashboards => showObjectQuickPick(dashboards, d => d.name, {placeHolder: "Dashboard"}))
+        .then(dashboard => showObjectQuickPick(dashboard.portalWidgets, w => w.getTitle(), {placeHolder: "Widget"}));
 }
 
-export function promptForDomainWidget(context: vscode.ExtensionContext){
+export function promptForDomainWidget(context: vscode.ExtensionContext) {
     return promptForDomain(context)
         .then(domain => domain.getDomainWidgetScripts())
-        .then(domainWidgetScripts => showObjectQuickPick(domainWidgetScripts, w => w.getTitle(), {placeHolder: 'Widget'}));
+        .then(domainWidgetScripts => showObjectQuickPick(domainWidgetScripts, w => w.getTitle(), {placeHolder: "Widget"}));
 }
 
-export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Thenable<domainModel.LuaScript>{
+export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Thenable<domainModel.LuaScript> {
     return promptForPortal(context)
         .then(portal => portal.getDevices())
-        .then(devices => showObjectQuickPick(devices, d => d.name, {placeHolder: 'Device'}))
+        .then(devices => showObjectQuickPick(devices, d => d.name, {placeHolder: "Device"}))
         .then(device => device.getLuaScripts())
-        .then(luaScripts => showObjectQuickPick(luaScripts, s=> s.getTitle(), {placeHolder: 'Lua Script'}));
+        .then(luaScripts => showObjectQuickPick(luaScripts, s => s.getTitle(), {placeHolder: "Lua Script"}));
 }
 
-function promptForPortal(context: vscode.ExtensionContext){
-    var sti = settings(context);
-    var savedAccount = sti.getCredentials();
-    var getAccount = savedAccount 
+function promptForPortal(context: vscode.ExtensionContext) {
+    const sti = settings(context);
+    const savedAccount = sti.getCredentials();
+    const getAccount = savedAccount
         ? Promise.resolve(savedAccount)
         : changeUser(context);
 
-    var domain: domainModel.Domain;
-    
+    let domain: domainModel.Domain;
+
     return promptForDomain(context)
         .then(dom => {
             domain = dom;
@@ -43,18 +45,18 @@ function promptForPortal(context: vscode.ExtensionContext){
         })
         .then(acc => new Exosite(domain.name, acc).getExositeAccount())
         .then(exositeAccount => domain.getPortalsByUserId(exositeAccount.id))
-        .then(portals => showObjectQuickPick(portals, p => p.name, {placeHolder: 'Portal'}));
+        .then(portals => showObjectQuickPick(portals, p => p.name, {placeHolder: "Portal"}));
 }
 
-function promptForDomain(context: vscode.ExtensionContext){
-    var sti = settings(context);
-    var savedAccount = sti.getCredentials();
-    var getAccount = savedAccount 
+function promptForDomain(context: vscode.ExtensionContext) {
+    const sti = settings(context);
+    const savedAccount = sti.getCredentials();
+    const getAccount = savedAccount
         ? Promise.resolve(savedAccount)
         : changeUser(context);
-        
-    var account: Account;
-    
+
+    let account: Account;
+
     return getAccount.then(acc => {
             account = acc;
             return getDomainName(sti);
@@ -62,16 +64,16 @@ function promptForDomain(context: vscode.ExtensionContext){
         .then(domainName => new domainModel.Domain(domainName, new Exosite(domainName, account)));
 }
 
-interface DomainSettings{
-    getDomain: () => string,
-    saveDomain: (domain: string) => void
+interface DomainSettings {
+    getDomain: () => string;
+    saveDomain: (domain: string) => void;
 }
 
-function getDomainName(ds: DomainSettings){
-    var domain = ds.getDomain();
-    
-    if(!domain){
-        return vscode.window.showInputBox({prompt: 'Domain', value: '[something.]exosite.com'})
+function getDomainName(ds: DomainSettings) {
+    let domain = ds.getDomain();
+
+    if (!domain) {
+        return vscode.window.showInputBox({prompt: "Domain", value: "[something.]exosite.com"})
             .then(domain => {
                 ds.saveDomain(domain);
                 return domain;

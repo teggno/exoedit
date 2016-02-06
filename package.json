@@ -4,6 +4,7 @@
   "description": "Exosite Widget Script Editor",
   "version": "0.1.0",
   "publisher": "teggno",
+  "license": "MIT",
   "engines": {
     "vscode": "^0.10.1"
   },
@@ -27,7 +28,8 @@
     "compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
   },
   "devDependencies": {
-    "typescript": "^1.6.2",
+    "tslint": "^3.3.0",
+    "typescript": "^1.7.5",
     "vscode": "0.10.x"
   },
   "dependencies": {
