@@ -1,9 +1,17 @@
 {
   "name": "exoedit",
-  "displayName": "exoedit",
-  "description": "Exosite Widget Script Editor",
-  "version": "0.1.0",
+  "displayName": "Exoedit",
+  "description": "Helps you edit and manage Exosite widget and lua scripts.",
+  "version": "0.1.1",
   "publisher": "teggno",
+  "author": {
+    "name": "Christian Bär"
+  },
+  "galleryBanner": {
+        "color": "#C2CE24",
+        "theme": "dark"
+  },
+  "keywords": ["exosite", "widget", "lua"],
   "license": "MIT",
   "engines": {
     "vscode": "^0.10.1"
@@ -37,6 +45,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/teggno/exoedit.git"
+    "url": "https://github.com/teggno/exoedit.git"
   }
 }
