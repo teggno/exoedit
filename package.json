@@ -5,12 +5,14 @@
   "version": "0.1.1",
   "publisher": "teggno",
   "author": {
-    "name": "Christian Bär"
+    "name": "Christian Bär",
+    "url": "http://blogs.adwise.ch/baer"
   },
   "galleryBanner": {
         "color": "#C2CE24",
         "theme": "dark"
   },
+  "icon": "images/icon.png",
   "keywords": ["exosite", "widget", "lua"],
   "license": "MIT",
   "engines": {
@@ -19,6 +21,7 @@
   "categories": [
     "Other"
   ],
+  "private": true,
   "activationEvents": [
     "onCommand:extension.listActions"
   ],
@@ -43,8 +46,12 @@
   "dependencies": {
     "request": "^2.69.0"
   },
+  "homepage": "https://github.com/teggno/exoedit",
   "repository": {
     "type": "git",
     "url": "https://github.com/teggno/exoedit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/teggno/exoedit/issues"
   }
 }
