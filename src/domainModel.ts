@@ -2,6 +2,8 @@
 
 import * as api from "./exosite";
 import Exosite from "./exosite";
+import * as mappings from "./mappings";
+import * as utilities from "./utilities";
 
 export class Domain {
     constructor(public name: string, private exosite: Exosite) {
@@ -72,7 +74,7 @@ export class Device {
 
 export interface ScriptSource {
     getScript: () => Thenable<string>;
-    getExositeReference: () => string;
+    setMapping: (path: string, mappings: mappings.Mapping) => void;
     upload: (newScript: string) => Thenable<void>;
     getTitle(): string;
 }
@@ -89,8 +91,8 @@ export class DomainWidgetScript implements ScriptSource {
         return this.getWidgetScriptObject().then(so => so.code);
     }
 
-    public getExositeReference() {
-        return this.widget.id;
+    public setMapping(path: string, target: mappings.Mapping) {
+        target.setDomainWidgetScriptMapping(path, this.widget.id);
     }
 
     public upload(newScript: string) {
@@ -118,8 +120,8 @@ export class PortalWidgetScript implements ScriptSource {
         return Promise.resolve(this.widget.script);
     }
 
-    public getExositeReference() {
-        return "portal";
+    public setMapping(path: string, target: mappings.Mapping) {
+        target.setPortalWidgetScriptMapping(path, this.dashboardId, this.widget.title);
     }
 
     public upload(newScript: string) {
@@ -160,8 +162,8 @@ export class LuaScript implements ScriptSource {
         return Promise.resolve(this.script);
     }
 
-    public getExositeReference() {
-        return this.rid;
+    public setMapping(path: string, mappings: mappings.Mapping) {
+        mappings.setLuaDeviceScriptMapping(path, this.rid);
     }
 
     public upload(newScript: string) {

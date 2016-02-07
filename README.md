@@ -43,3 +43,33 @@ When you have selected this command, you will be prompted for the Portal, the De
 When you use one of the commands mentioned above, you will be prompted for your credentials and a domain
 which will be stored for subsequent use.
 In case you need to change any of them, you can select the "Clear User and Domain" command.
+
+## Script Mapping
+If you have opened a folder (as opposed to just a file), the extension saves the mapping between an Exosite script and the corresponding file in a JSON document.
+
+### JSON Example
+```json
+{
+    "domain": "https://foodomain.exosite.com",
+    "mappings":{
+        "lua":{
+            "device": [
+                { "path": "abc/one.lua", "rid": "abcd1234" },
+                { "path": "xy/def.lua", "rid": "ghij5678" }
+            ]
+        },
+        "widget": {
+            "domain": [
+                { "path": "some/script1.js", "id": "1234567" },
+                { "path": "script2.js", "id": "8474987" }
+            ],
+            "portal": [
+                { "path": "foo/barscript.js", "dashboardId": "1234567", "widgetTitle": "This is the title" },
+                { "path": "foo/bazscript.js", "dashboardId": "243242", "widgetTitle": "Another title" }
+            ]
+        }
+    }
+}
+```
+
+**NOTE: Portal Widget scripts are mapped using their title, so the mapping gets broken if you change the widget's title in Exosite.**

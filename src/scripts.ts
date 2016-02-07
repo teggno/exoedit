@@ -5,6 +5,8 @@ import { showTextInEditor, hasWorkspace, saveAs } from "./vscodeUtilities";
 import { promptForPortalWidget, promptForDomainWidget, promptForDeviceLuaScript } from "./prompts";
 import { ScriptSource } from "./domainModel";
 import settingsFactory from "./settings";
+import { Mapping } from "./mappings";
+import { getExoeditFile } from "./exoeditFile";
 
 export function downloadPortalWidgetScript(context: vscode.ExtensionContext) {
     downloadScript(() => promptForPortalWidget(context), context);
@@ -109,16 +111,16 @@ function promptForSaveAction(scriptSource: ScriptSource) {
 }
 
 function saveAndMap(scriptSource: ScriptSource) {
-    return saveFile().then(result => {
+    return saveAs().then(result => {
         if (!result) return;
-        saveMapping(vscode.window.activeTextEditor.document.fileName, scriptSource);
+        const relativeFilePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.uri);
+        saveMapping(relativeFilePath, scriptSource);
     });
 }
 
-function saveFile() {
-    return saveAs();
-}
-
 function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
-
+    return getExoeditFile().then(exoeditFile => {
+        scriptSource.setMapping(relativeFilePath, exoeditFile.mapping);
+        return exoeditFile.save();
+    });
 }
