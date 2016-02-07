@@ -114,7 +114,7 @@ function saveAndMap(scriptSource: ScriptSource) {
     return saveAs().then(result => {
         if (!result) return;
         const relativeFilePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.uri);
-        saveMapping(relativeFilePath, scriptSource);
+        return saveMapping(relativeFilePath, scriptSource);
     });
 }
 
@@ -122,5 +122,8 @@ function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
     return getExoeditFile().then(exoeditFile => {
         scriptSource.setMapping(relativeFilePath, exoeditFile.mapping);
         return exoeditFile.save();
+    })
+    .then(null, error => {
+        console.error(error);
     });
 }

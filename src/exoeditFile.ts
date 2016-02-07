@@ -53,6 +53,7 @@ class ExoeditFileImpl implements ExoeditFile {
             return new Promise<void>((resolve, reject) => {
                 const saveCallback = err => {
                     if (err) return reject("Could not save exoedit.json file");
+                    console.log("Saved exoedit.json file");
                     resolve();
                 };
 
