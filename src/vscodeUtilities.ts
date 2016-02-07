@@ -29,6 +29,34 @@ export function activateNewUntitledFile() {
     });
 }
 
+// VS Code has the weird behavior to immediately close a file after it has been saved
+// if it is has been a new untitled file prior to saving it. This method provides
+// a shorthand for saving a new untitled file and keeping it open in the editor.
+export function saveAs() {
+    return new Promise((resolve, reject) => {
+        // Would have preferred to use onDidSaveTextDocument instead of FileSystemWatcher.
+        // However, that event doesn't get fired when new untitled files are saved.
+        const handler = uri => {
+                creteDisp.dispose();
+                changeDisp.dispose();
+                vscode.workspace.openTextDocument(uri).then(doc =>
+                    vscode.window.showTextDocument(doc).then(() => resolve(true))
+                );
+            };
+        const watcher = vscode.workspace.createFileSystemWatcher("**/*", false, false, true);
+        const creteDisp = watcher.onDidCreate(handler);
+        // needed in case an existing file will be overwritten
+        const changeDisp = watcher.onDidChange(handler);
+        vscode.window.activeTextEditor.document.save().then(saved => {
+            if (!saved) {
+                creteDisp.dispose();
+                changeDisp.dispose();
+                resolve(false);
+            }
+        });
+    });
+}
+
 export function hasActiveTextEditorUntitledEmptyFile() {
     return vscode.window.activeTextEditor
         && vscode.window.activeTextEditor.document

@@ -26,6 +26,13 @@ export default function(context: vscode.ExtensionContext) {
             const clearCred = context.globalState.update("cred", undefined);
             const clearDomain = context.globalState.update("domain", undefined);
             return Promise.all([clearCred, clearDomain]);
+        },
+        getMappingPreference: () => {
+            const obj: any = context.workspaceState.get("mappingPrefs");
+            return obj ? <boolean>obj.always : null;
+        },
+        saveMappingPreference: (always: boolean) => {
+            return context.workspaceState.update("mappingPrefs", { always: always} );
         }
     };
 }

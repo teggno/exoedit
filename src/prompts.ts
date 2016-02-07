@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import settings from "./settings";
+import settingsFactory from "./settings";
 import {Account} from "./settings";
 import changeUser from "./changeUser";
 import {showObjectQuickPick} from "./vscodeUtilities";
@@ -30,8 +30,8 @@ export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Then
 }
 
 function promptForPortal(context: vscode.ExtensionContext) {
-    const sti = settings(context);
-    const savedAccount = sti.getCredentials();
+    const settings = settingsFactory(context);
+    const savedAccount = settings.getCredentials();
     const getAccount = savedAccount
         ? Promise.resolve(savedAccount)
         : changeUser(context);
@@ -49,8 +49,8 @@ function promptForPortal(context: vscode.ExtensionContext) {
 }
 
 function promptForDomain(context: vscode.ExtensionContext) {
-    const sti = settings(context);
-    const savedAccount = sti.getCredentials();
+    const settings = settingsFactory(context);
+    const savedAccount = settings.getCredentials();
     const getAccount = savedAccount
         ? Promise.resolve(savedAccount)
         : changeUser(context);
@@ -59,7 +59,7 @@ function promptForDomain(context: vscode.ExtensionContext) {
 
     return getAccount.then(acc => {
             account = acc;
-            return getDomainName(sti);
+            return getDomainName(settings);
         })
         .then(domainName => new domainModel.Domain(domainName, new Exosite(domainName, account)));
 }

@@ -1,16 +1,17 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { showTextInEditor } from "./vscodeUtilities";
+import { showTextInEditor, hasWorkspace, saveAs } from "./vscodeUtilities";
 import { promptForPortalWidget, promptForDomainWidget, promptForDeviceLuaScript } from "./prompts";
 import { ScriptSource } from "./domainModel";
+import settingsFactory from "./settings";
 
 export function downloadPortalWidgetScript(context: vscode.ExtensionContext) {
-    downloadScript(() => promptForPortalWidget(context));
+    downloadScript(() => promptForPortalWidget(context), context);
 }
 
 export function downloadDomainWidgetScript(context: vscode.ExtensionContext) {
-    downloadScript(() => promptForDomainWidget(context));
+    downloadScript(() => promptForDomainWidget(context), context);
 }
 
 export function uploadDomainWidgetScript(context: vscode.ExtensionContext) {
@@ -22,17 +23,22 @@ export function uploadPortalWidgetScript(context: vscode.ExtensionContext) {
 }
 
 export function downloadDeviceLuaScript(context: vscode.ExtensionContext) {
-    downloadScript(() => promptForDeviceLuaScript(context));
+    downloadScript(() => promptForDeviceLuaScript(context), context);
 }
 
 export function uploadDeviceLuaScript(context: vscode.ExtensionContext) {
     uploadScript(() => promptForDeviceLuaScript(context));
 }
 
-function downloadScript(prompt: () => Thenable<ScriptSource>) {
+function downloadScript(prompt: () => Thenable<ScriptSource>, context: vscode.ExtensionContext) {
+    let scriptSource: ScriptSource;
     prompt()
-        .then(scriptSource => scriptSource.getScript())
+        .then(scs => {
+            scriptSource =  scs;
+            return scriptSource.getScript();
+        })
         .then(showTextInEditor)
+        .then(() => promptForMappingIfEnabled(scriptSource, context))
         .then(null, error => { console.error(error); });
 }
 
@@ -57,4 +63,62 @@ function uploadScript(prompt: () => Thenable<ScriptSource>) {
         .then(scriptSource => scriptSource.upload(vscode.window.activeTextEditor.document.getText()))
         .then(() => vscode.window.showInformationMessage("Upload completed"))
         .then(null, error => console.error(error));
+}
+
+function promptForMappingIfEnabled(scriptSource: ScriptSource, context: vscode.ExtensionContext) {
+    if (!hasWorkspace()) return;
+
+    const settings = settingsFactory(context);
+    const mappingPreference = settings.getMappingPreference();
+    if (mappingPreference === true) {
+        saveAndMap(scriptSource);
+    }
+    else if (mappingPreference !== false) {
+        promptForSaveAction(scriptSource)
+            .then(newPreference => {
+                if (newPreference === true || newPreference === false)
+                    settings.saveMappingPreference(newPreference);
+            });
+    }
+}
+
+function promptForSaveAction(scriptSource: ScriptSource) {
+    let preference: boolean;
+    const actions = [
+        { name: "No, never", fn: () => preference = false },
+        {
+            name: "Yes, always",
+            fn: () => {
+                preference = true;
+                saveAndMap(scriptSource);
+            }
+        },
+        { name: "No" },
+        { name: "Yes", fn: () => saveAndMap(scriptSource) },
+    ];
+
+    return vscode.window.showInformationMessage(
+        "Would you like to save the mapping of the newly created document to the script from Exosite?",
+        ...actions.map(action => action.name)
+    ).then(name => {
+        const action = <any>actions.find(a => a.name === name);
+        return action && action.fn
+            ? action.fn()
+            : Promise.reject("Close clicked");
+    }).then(() => preference);
+}
+
+function saveAndMap(scriptSource: ScriptSource) {
+    return saveFile().then(result => {
+        if (!result) return;
+        saveMapping(vscode.window.activeTextEditor.document.fileName, scriptSource);
+    });
+}
+
+function saveFile() {
+    return saveAs();
+}
+
+function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
+
 }
