@@ -1,6 +1,8 @@
 import {clone} from "./utilities";
+import Exosite from "./exosite";
+import * as scriptSources from "./scriptSources";
 
-export class Mapping {
+export class Mappings implements scriptSources.Mapper {
     private deviceLuaScriptMappings: LuaDeviceScriptMapping[] = [];
     private domainWidgetScriptMappings: DomainWidgetScriptMapping[] = [];
     private portalWidgetScriptMappings: PortalWidgetScriptMapping[] = [];
@@ -80,6 +82,23 @@ export class Mapping {
             result.widget.portal = clone(this.portalWidgetScriptMappings).sort(comparer);
 
         return result;
+    }
+
+    public getUploader(relativePath: string) {
+        const luaMapping = this.find(this.deviceLuaScriptMappings, relativePath);
+        if (luaMapping) return scriptSources.LuaScript.getUploader(luaMapping.rid);
+
+        const domainWidgetMapping = this.find(this.domainWidgetScriptMappings, relativePath);
+        if (domainWidgetMapping) return scriptSources.DomainWidgetScript.getUploader(domainWidgetMapping.id);
+
+        const portalWidgetMapping = this.find(this.portalWidgetScriptMappings, relativePath);
+        if (portalWidgetMapping) return scriptSources.PortalWidgetScript.getUploader(portalWidgetMapping.dashboardId, portalWidgetMapping.widgetTitle);
+
+        return undefined;
+    }
+
+    public isMapped(relativePath: string) {
+        return !!this.getUploader(relativePath);
     }
 }
 

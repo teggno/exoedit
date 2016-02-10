@@ -2,12 +2,12 @@
 
 import * as vscode from "vscode";
 
-export function showObjectQuickPick<T>(items: T[], titleFn: (item: T) => string, options?: vscode.QuickPickOptions) {
-    const titles = items.map(titleFn);
-    return vscode.window.showQuickPick(titles, options)
-        .then(title => {
-            return items.find(item => titleFn(item) === title);
-        });
+export function showObjectQuickPick<T>(items: T[] | Thenable<T[]>, titleFn: (item: T) => string, options?: vscode.QuickPickOptions) {
+    return Promise.resolve(items)
+        .then(resolvedItems =>
+            vscode.window.showQuickPick(resolvedItems.map(titleFn), options)
+                .then(title => resolvedItems.find(item => titleFn(item) === title))
+        );
 }
 
 export function hasWorkspace() {

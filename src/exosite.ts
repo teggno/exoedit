@@ -1,7 +1,6 @@
 "use strict";
 
 import fetch from "./fetch";
-import {Account} from "./settings";
 import {expectStatus200} from "./fetch";
 import {concatWithSlash} from "./utilities";
 
@@ -10,8 +9,14 @@ export interface ExositeAccount {
 }
 
 export default class{
-    constructor(private domain: string, private account: Account) {
+    constructor(private domain: string, userName: string, password: string) {
+        this.account = {
+            userName: userName,
+            password: password
+        };
     }
+
+    private account: { userName: string; password: string};
 
     public getExositeAccount(): Promise<ExositeAccount> {
         const options = {

@@ -1,12 +1,13 @@
 "use strict";
 
 import * as vscode from "vscode";
+import {showObjectQuickPick, hasWorkspace} from "./vscodeUtilities";
 import settingsFactory from "./settings";
 import {Account} from "./settings";
 import changeUser from "./changeUser";
-import {showObjectQuickPick} from "./vscodeUtilities";
 import Exosite from "./exosite";
 import * as domainModel from  "./domainModel";
+import { getExoeditFile } from "./exoeditFile";
 
 export function promptForPortalWidget(context: vscode.ExtensionContext) {
     return promptForPortal(context)
@@ -16,12 +17,12 @@ export function promptForPortalWidget(context: vscode.ExtensionContext) {
 }
 
 export function promptForDomainWidget(context: vscode.ExtensionContext) {
-    return promptForDomain(context)
+    return getDomain(context)
         .then(domain => domain.getDomainWidgetScripts())
         .then(domainWidgetScripts => showObjectQuickPick(domainWidgetScripts, w => w.getTitle(), {placeHolder: "Widget"}));
 }
 
-export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Thenable<domainModel.LuaScript> {
+export function promptForDeviceLuaScript(context: vscode.ExtensionContext) {
     return promptForPortal(context)
         .then(portal => portal.getDevices())
         .then(devices => showObjectQuickPick(devices, d => d.name, {placeHolder: "Device"}))
@@ -30,55 +31,58 @@ export function promptForDeviceLuaScript(context: vscode.ExtensionContext): Then
 }
 
 function promptForPortal(context: vscode.ExtensionContext) {
-    const settings = settingsFactory(context);
-    const savedAccount = settings.getCredentials();
-    const getAccount = savedAccount
-        ? Promise.resolve(savedAccount)
-        : changeUser(context);
-
-    let domain: domainModel.Domain;
-
-    return promptForDomain(context)
-        .then(dom => {
-            domain = dom;
-            return getAccount;
-        })
-        .then(acc => new Exosite(domain.name, acc).getExositeAccount())
-        .then(exositeAccount => domain.getPortalsByUserId(exositeAccount.id))
+    return getDomain(context)
+        .then(domain => domain.getPortals())
         .then(portals => showObjectQuickPick(portals, p => p.name, {placeHolder: "Portal"}));
 }
 
-function promptForDomain(context: vscode.ExtensionContext) {
-    const settings = settingsFactory(context);
-    const savedAccount = settings.getCredentials();
-    const getAccount = savedAccount
-        ? Promise.resolve(savedAccount)
-        : changeUser(context);
-
+function getDomain(context: vscode.ExtensionContext) {
     let account: Account;
 
-    return getAccount.then(acc => {
+    return getAccount(context)
+        .then(acc => {
+            if (!account) return undefined;
             account = acc;
-            return getDomainName(settings);
+            return getDomainName();
         })
-        .then(domainName => new domainModel.Domain(domainName, new Exosite(domainName, account)));
+        .then(domainName => {
+            if (!domainName) return undefined;
+            const exosite = new Exosite(domainName, account.userName, account.password);
+            return new domainModel.Domain(domainName, exosite);
+        });
 }
 
-interface DomainSettings {
-    getDomain: () => string;
-    saveDomain: (domain: string) => void;
+export function getAccount(context: vscode.ExtensionContext) {
+    return hasWorkspace()
+        ? Promise.resolve(settingsFactory(context).getCredentials()).then(account => account || promptForAccountAndSave(context))
+        : promptForAccountAndSave(context);
 }
 
-function getDomainName(ds: DomainSettings) {
-    let domain = ds.getDomain();
+function getDomainName() {
+    return hasWorkspace()
+        ? getExoeditFile().then(file => file.domain).then(domain => domain || promptForDomainName())
+        : promptForDomainName();
+}
 
-    if (!domain) {
-        return vscode.window.showInputBox({prompt: "Domain", value: "[something.]exosite.com"})
-            .then(domain => {
-                ds.saveDomain(domain);
-                return domain;
-            });
-    }
-    console.log(`Using domain "${domain}"`);
-    return Promise.resolve(domain);
+function promptForDomainName() {
+    return vscode.window.showInputBox({prompt: "Domain", value: "[something.]exosite.com"});
+}
+
+function promptForAccount() {
+    let userName;
+    return vscode.window.showInputBox({prompt: "Username", placeHolder: "your@email.com" })
+        .then(name => {
+            if (!name) return undefined;
+            userName = name;
+            return vscode.window.showInputBox({prompt: "Password", password: true });
+        })
+        .then(password => password ? { userName: userName, password: password } : undefined);
+}
+
+function promptForAccountAndSave(context: vscode.ExtensionContext) {
+    return promptForAccount().then(account => {
+        return account && hasWorkspace()
+            ? settingsFactory(context).saveCredentials(account).then(() => account)
+            : account;
+    });
 }

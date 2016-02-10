@@ -3,34 +3,38 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { MappingDto, Mapping } from "./mappings";
+import { MappingDto, Mappings } from "./mappings";
 
 export function getExoeditFile(): Thenable<ExoeditFile> {
     return getExoeditFileDto().then(exoeditFileDto => new ExoeditFileImpl(exoeditFileDto));
 }
 
 export interface ExoeditFile {
-    mapping: Mapping;
+    mappings: Mappings;
     domain: string;
     save: () => Thenable<void>;
 }
 
 class ExoeditFileImpl implements ExoeditFile {
-    private _mapping: Mapping;
+    private _mappings: Mappings;
     private _domain: string;
 
     constructor(exoeditFileDto?: ExoeditFileDto) {
         if (!exoeditFileDto) exoeditFileDto = {};
 
-        this._mapping = exoeditFileDto.mapping
-            ? new Mapping(exoeditFileDto.mapping)
-            : new Mapping();
+        this._mappings = exoeditFileDto.mapping
+            ? new Mappings(exoeditFileDto.mapping)
+            : new Mappings();
 
         this._domain = exoeditFileDto.domain;
     }
 
-    get mapping() {
-        return this._mapping;
+    get mappings() {
+        return this._mappings;
+    }
+
+    set domain(value: string){
+        this._domain = value;
     }
 
     get domain() {
@@ -39,8 +43,8 @@ class ExoeditFileImpl implements ExoeditFile {
 
     save() {
         return getExoeditFileDto().then(dto => {
-            if (!this._mapping.isEmpty) {
-                dto.mapping = this._mapping.Serialize();
+            if (!this._mappings.isEmpty) {
+                dto.mapping = this._mappings.Serialize();
             }
 
             if (this._domain) {
