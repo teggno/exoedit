@@ -41,7 +41,7 @@ function getDomain(context: vscode.ExtensionContext) {
 
     return getAccount(context)
         .then(acc => {
-            if (!account) return undefined;
+            if (!acc) return undefined;
             account = acc;
             return getDomainName();
         })
@@ -54,7 +54,9 @@ function getDomain(context: vscode.ExtensionContext) {
 
 export function getAccount(context: vscode.ExtensionContext) {
     return hasWorkspace()
-        ? Promise.resolve(settingsFactory(context).getCredentials()).then(account => account || promptForAccountAndSave(context))
+        ? Promise.resolve(settingsFactory(context).getCredentials()).then(account => {
+            return account || promptForAccountAndSave(context);
+        })
         : promptForAccountAndSave(context);
 }
 
