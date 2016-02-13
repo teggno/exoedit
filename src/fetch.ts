@@ -1,6 +1,6 @@
 "use strict";
 
-const request = require("request");
+import request = require("request");
 import {clone} from "./utilities";
 
 interface FetchOptions {
@@ -17,7 +17,7 @@ interface FetchOptions {
 
 export default function fetch(options: FetchOptions): Promise<{response: {statusCode: number}, body: string}> {
     const auth = options.auth ? {user: options.auth.userName, pass: options.auth.password} : null;
-    const newOptions = <any>clone(options);
+    const newOptions = <request.OptionsWithUrl>clone(options);
     if (auth) newOptions.auth = auth;
     if (!newOptions.method) newOptions.method = "GET";
 
