@@ -1,53 +1,48 @@
 # Exoedit
 A Visual Studio Code extension that helps you edit and manage scripts for Exosite.
 
-## Usage
+## Usage Scenarios
+### Edit a Script of a Widget or a Lua Script
 1. Open the command list (by pressing F1 or Ctrl+Shift+P)
 2. Select `Exoedit`
-3. Select one of the appearing main actions (each is explained below).
+3. Select one of the three edit actions. This will prompt you for the source of the script, download it and display it in the editor.
 
-## Main Actions
+### Upload the content of the current Editor Window to Exosite
+As soon as you have an active editor window with content in it, you can use Exoedit to upload the content to Exosite. Depending on whether
+you have previously saved the mapping of the current file to the corresponding artifact on Exosite, there are two ways for uploading.
 
-### Edit Domain Widget Script
-Use this action to get the JavaScript code from an Exosite Domain Widget into the Editor. 
-When you have selected this command, you will be prompted for the Widget. 
+#### a) The Mapping of the Script to an Exosite artifact has been saved
+1. Open the command list (by pressing F1 or Ctrl+Shift+P)
+2. Select `Exoedit: Publish`
+3. The status bar will indicate when the script has been published.
 
-### Edit Portal Widget Script
-Use this action to get the JavaScript code from a Widget that only exists on a Portal Dashboard into the Editor. 
-When you have selected this command, you will be prompted for the Portal, the Dashboard and the Widget. 
+#### b) The Mapping of the Script to an Exosite artifact has not been saved
+1. Open the command list (by pressing F1 or Ctrl+Shift+P)
+2. Select `Exoedit`
+3. Select one of the three upload actions. This will prompt you for the destination of the script, where the content of the editor will be uploaded.
+4. The status bar will indicate when the script has been published.
 
-### Edit Device Lua Script
-Use this action to get the Lua code from a Device Script into the Editor. 
-When you have selected this command, you will be prompted for the Portal, the Device and the Script. 
+## Usage Modes
+Exoedit can be used in workspace mode and in single file mode. Some actions are only available in workspace mode.
 
-### Upload Domain Widget Script
-Use this action to upload the code of the current editor window to an existing Exosite Domain Widget. 
-When you have selected this command, you will be prompted for the Domain Widget.
+### Workspace Mode
+When a folder is opened in Visual Studio Code, you can use the extension in workspace mode. Workspace mode is entered automatically as soon as you download a script from exosite
+and choose to save the mapping of the online script to a local file.
 
-**NOTE: This command is only available if there is an active editor window that contains something.** 
+Whenever you open that folder again, the extension will be in workspace mode.
 
-### Upload Portal Widget Script
-Use this action to upload the code in the current editor window to an existing Exosite Widget that
-exists on a Portal Dashboard. 
-When you have selected this command, you will be prompted for the Portal, the Dashboard and the Widget.
+#### Characteristics of Workspace Mode
+* Domain is taken from exoedit.json, which implies that you can only work on Exosite artifacts of a single domain per folder.
+* Credentials are taken from workspaceState.
+* All 3 edit actions are available.
+* All 3 upload actions are available.
+* Publish command will publish the current file to the mapped artifact. You can set a keyboard shortcut for the publish command. The command's name is `exoedit.publish`.
+* Download mapping decision (always/never) is taken from workspaceState.
 
-**NOTE: This command is only available if there is an active editor window that contains something.** 
+#### Script Mapping
+The mappings of your script files to the corresponding Exosite artifacts, as well as the Exosite domain, are stored in the file `exoedit.json`.
 
-### Upload Device Lua Script
-Use this action to replace the Lua script of a Device with the one inside the current editor window.
-When you have selected this command, you will be prompted for the Portal, the Device and the Script.
-
-**NOTE: This command is only available if there is an active editor window that contains something.** 
-
-### Clear User Information
-When you use one of the commands mentioned above, you will be prompted for your credentials which will 
-be stored for subsequent use. In case you need to change them, you can select the "Clear User Information"
-command.
-
-## Script Mapping
-If you have opened a folder (as opposed to just a file), the extension saves the mapping between an Exosite script and the corresponding file in the file `exoedit.json`.
-
-### JSON Example
+**JSON Example**
 ```json
 {
     "domain": "foodomain.exosite.com",
@@ -73,3 +68,13 @@ If you have opened a folder (as opposed to just a file), the extension saves the
 ```
 
 **NOTE: Portal Widget scripts are mapped using their title, so the mapping gets broken if you change the widget's title in Exosite.**
+
+### Single File Mode
+When you have not opened a folder in Visual Studio Code (i.e. you have just opened a file or nothing at all), the extension works in single file mode.
+
+#### Characteristics of Single File Mode
+* The domain always has to be entered.
+* Credentials always have to be entered.
+* All 3 download actions are available.
+* All 3 upload actions are available.
+
