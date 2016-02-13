@@ -8,8 +8,7 @@ A Visual Studio Code extension that helps you edit and manage scripts for Exosit
 3. Select one of the three edit actions. This will prompt you for the source of the script, download it and display it in the editor.
 
 ### Upload the content of the current Editor Window to Exosite
-As soon as you have an active editor window with content in it, you can use Exoedit to upload the content to Exosite. Depending on whether
-you have previously saved the mapping of the current file to the corresponding artifact on Exosite, there are two ways for uploading.
+As soon as you have an active editor window with content in it, you can use Exoedit to upload the content to Exosite. Depending on whether you have previously saved the mapping of the current file to the corresponding artifact on Exosite, there are two ways for uploading:
 
 #### a) The Mapping of the Script to an Exosite artifact has been saved
 1. Open the command list (by pressing F1 or Ctrl+Shift+P)
@@ -26,8 +25,7 @@ you have previously saved the mapping of the current file to the corresponding a
 Exoedit can be used in workspace mode and in single file mode. Some actions are only available in workspace mode.
 
 ### Workspace Mode
-When a folder is opened in Visual Studio Code, you can use the extension in workspace mode. Workspace mode is entered automatically as soon as you download a script from exosite
-and choose to save the mapping of the online script to a local file.
+When a folder is opened in Visual Studio Code, you can use the extension in workspace mode. Workspace mode is entered automatically as soon as you download a script from exosite and choose to save the mapping of the online script to a local file.
 
 Whenever you open that folder again, the extension will be in workspace mode.
 
