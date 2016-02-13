@@ -23,14 +23,19 @@
   ],
   "private": true,
   "activationEvents": [
-    "onCommand:extension.listActions"
+    "onCommand:exoedit.listActions",
+    "workspaceContains:exoedit.json"
   ],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [
       {
-        "command": "extension.listActions",
+        "command": "exoedit.listActions",
         "title": "Exoedit"
+      },
+      {
+        "command": "exoedit.publish",
+        "title": "Exoedit: Publish"
       }
     ]
   },

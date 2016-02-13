@@ -9,7 +9,7 @@ import { Mappings } from "./mappings";
 import { getExoeditFile } from "./exoeditFile";
 import Exosite from "./exosite";
 
-export default function getMainActions() {
+export function getMainActions() {
     const actionPromises = [
         { title: "Edit Domain Widget Script", fn: downloadDomainWidgetScript },
         { title: "Edit Portal Widget Script", fn: downloadPortalWidgetScript },
@@ -17,7 +17,6 @@ export default function getMainActions() {
         hasActiveTextEditorWithContent() ? { title: "Upload Domain Widget Script", fn: uploadDomainWidgetScript } : undefined,
         hasActiveTextEditorWithContent() ? { title: "Upload Portal Widget Script", fn: uploadPortalWidgetScript } : undefined,
         hasActiveTextEditorWithContent() ? { title: "Upload Device Lua Script", fn: uploadDeviceLuaScript } : undefined,
-        isMapped().then(result => result ? { title: "Publish according to mapping", fn: uploadMapped } : undefined ),
         hasWorkspace() ? { title: "Clear user information", fn: (context) => { settingsFactory(context).clearCredentials(); } } : undefined
     ];
 
@@ -52,10 +51,10 @@ function uploadDeviceLuaScript(context: vscode.ExtensionContext) {
     uploadScript(() => promptForDeviceLuaScript(context));
 }
 
-function uploadMapped(context: vscode.ExtensionContext) {
+export function publishMapped(context: vscode.ExtensionContext) {
     const path = vscode.window.activeTextEditor.document.fileName;
     const relativePath = vscode.workspace.asRelativePath(path);
-    getExoeditFile().then(file => file.mappings.getUploader(relativePath))
+    return getExoeditFile().then(file => file.mappings.getUploader(relativePath))
         .then(uploader => {
             getExoeditFile().then(file => {
                 getAccount(context).then(account => {
@@ -66,7 +65,7 @@ function uploadMapped(context: vscode.ExtensionContext) {
         });
 }
 
-function isMapped() {
+export function isMapped() {
     if (!hasWorkspace()) return Promise.resolve(false);
 
     const path = vscode.window.activeTextEditor.document.fileName;
