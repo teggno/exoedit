@@ -17,7 +17,7 @@ export function getMainActions() {
         hasActiveTextEditorWithContent() ? { title: "Upload Domain Widget Script", fn: uploadDomainWidgetScript } : undefined,
         hasActiveTextEditorWithContent() ? { title: "Upload Portal Widget Script", fn: uploadPortalWidgetScript } : undefined,
         hasActiveTextEditorWithContent() ? { title: "Upload Device Lua Script", fn: uploadDeviceLuaScript } : undefined,
-        hasWorkspace() ? { title: "Clear user information", fn: (context) => { settingsFactory(context).clearCredentials(); } } : undefined
+        hasWorkspace() ? { title: "Clear Zser Information", fn: (context) => { settingsFactory(context).clearCredentials(); } } : undefined
     ];
 
     return Promise.all(actionPromises).then(actions => actions.filter(item => !!item));
