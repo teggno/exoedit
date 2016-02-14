@@ -27,8 +27,8 @@
   ],
   "private": true,
   "activationEvents": [
-    "onCommand:exoedit.listActions",
-    "workspaceContains:exoedit.json"
+    "workspaceContains:exoedit.json",
+    "onCommand:exoedit.listActions"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -40,6 +40,14 @@
       {
         "command": "exoedit.publish",
         "title": "Exoedit: Publish"
+      },
+      {
+        "command": "exoedit.runWidget",
+        "title": "Exoedit: Run Widget"
+      },
+      {
+        "command": "exoedit.stopWidgetServer",
+        "title": "Exoedit: Stop Widget Server"
       }
     ]
   },
@@ -55,7 +63,8 @@
   },
   "dependencies": {
     "luamin": "^1.0.0",
-    "request": "^2.69.0"
+    "request": "^2.69.0",
+    "whatwg-fetch": "^0.11.0"
   },
   "homepage": "https://github.com/teggno/exoedit",
   "repository": {
