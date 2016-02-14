@@ -1,7 +1,8 @@
 import * as http from "http";
 import { window, ExtensionContext } from "vscode";
 import { readFile } from "fs";
-import rpcRead from "./rpcRead";
+import read from "./read";
+import portal from "./portal";
 
 export function runWidget(path: string, context: ExtensionContext ) {
     const handlers = getHandlers(path, context);
@@ -33,7 +34,7 @@ export function runWidget(path: string, context: ExtensionContext ) {
 const divContainerId = "container";
 
 const fetchScript = "<script src=\"fetch\"></script>";
-const mainScript = "<script>var exports = { portal: {}};</script>";
+const mainScript = "<script>var exports = { };</script>";
 
 const indexHtml =
     `<!DOCTYPE html><html><head>${fetchScript}${mainScript}<script src="exositeFake"></script><script src="widget"></script></head><body><div id="${divContainerId}"></div></body></html>`;
@@ -44,7 +45,7 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
             response.setHeader("content-type", "text/html");
             response.end(indexHtml);
         }},
-        { url: "/fetch", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(context.asAbsolutePath("node_modukes/whatwg-fetch/fetch.js"), (err, data) => {
+        { url: "/fetch", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(context.asAbsolutePath("node_modules/whatwg-fetch/fetch.js"), (err, data) => {
             response.setHeader("content-type", "text/javascript");
             response.end(data);
         })},
@@ -55,9 +56,10 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
         { url: "/widget", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(widgetPath, (err, data) => {
             response.setHeader("content-type", "text/javascript");
             const newScript =
-                `document.addEventListener("DOMContentLoaded", function(event) { var read = exports.read; (${data.toString()})(document.getElementById("${divContainerId}"), exports.portal)});`;
+                `document.addEventListener("DOMContentLoaded", function(event) { var read = exports.read; fetch("portal").then(function(response){response.json().then(function(portal){(${data.toString()})(document.getElementById("${divContainerId}"), portal)});});});`;
             response.end(newScript);
         })},
-        { url: "/read", handle: rpcRead }
+        { url: "/read", handle: read },
+        { url: "/portal", handle: portal(widgetPath) }
     ];
 }

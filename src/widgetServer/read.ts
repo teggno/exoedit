@@ -1,19 +1,11 @@
 import { IncomingMessage, ServerResponse } from "http";
+import { readToEnd, jsonResponse, ensurePost } from "./widgetServerUtilities";
 
 export default function (request: IncomingMessage, response: ServerResponse) {
-    if (request.method !== "POST") {
-        response.statusCode = 405;
-        response.end("Only POST is supported");
-        return;
-    }
+    if (!ensurePost(request, response)) return;
 
-    let body = "";
-    request.on("data",  chunk => {
-        body += chunk.toString();
-    });
-
-    request.on("end", () => {
-        const parsed = <ReadBody>JSON.parse(body);
+    readToEnd(request).then(content => {
+        const parsed = <ReadBody>JSON.parse(content);
         if (!parsed.targetResource || parsed.targetResource.length !== 2) {
             response.statusCode = 400;
             response.end("posted json data must contain a targetResource field which needs to be an array containing 2 strings");
@@ -25,9 +17,8 @@ export default function (request: IncomingMessage, response: ServerResponse) {
             return;
         }
 
-        response.statusCode = 200;
-        response.setHeader("content-type", "application/json");
-        response.end(JSON.stringify([[123, "Something from exosite"], [456, "another thing from exosite"]]));
+        jsonResponse(response, [[123, "Something from exosite"], [456, "another thing from exosite"]]);
+        // TODO: get stuff from exosite and write it to the response
     });
 }
 

@@ -182,6 +182,10 @@ export interface DashboardWidget {
     title: string;
     script: string;
     WidgetScriptID: string;
+    /**
+     * Contains the rids of the dataports that have been selected for the widget.
+     */
+    rids: string[];
 }
 
 
