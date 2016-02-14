@@ -1,17 +1,17 @@
 "use strict";
 
-import * as vscode from "vscode";
+import { window, workspace, commands, QuickPickOptions, TextDocument, Position } from "vscode";
 
-export function showObjectQuickPick<T>(items: T[] | Thenable<T[]>, titleFn: (item: T) => string, options?: vscode.QuickPickOptions) {
+export function showObjectQuickPick<T>(items: T[] | Thenable<T[]>, titleFn: (item: T) => string, options?: QuickPickOptions) {
     return Promise.resolve(items)
         .then(resolvedItems =>
-            vscode.window.showQuickPick(resolvedItems.map(titleFn), options)
+            window.showQuickPick(resolvedItems.map(titleFn), options)
                 .then(title => resolvedItems.find(item => titleFn(item) === title))
         );
 }
 
 export function hasWorkspace() {
-    return !!vscode.workspace.rootPath;
+    return !!workspace.rootPath;
 }
 
 export function activateNewUntitledFile() {
@@ -19,13 +19,13 @@ export function activateNewUntitledFile() {
         // if there is no active text editor before "workbench.action.files.newUntitledFile"
         // is executed, there will also be none immediately after. Therefore we have to continue
         // when onDidChangeActiveTextEditor().
-        const disposable = vscode.window.onDidChangeActiveTextEditor(e => {
-            if (vscode.window.activeTextEditor !== null) {
+        const disposable = window.onDidChangeActiveTextEditor(e => {
+            if (window.activeTextEditor !== null) {
                 disposable.dispose();
                 resolve();
             }
         });
-        vscode.commands.executeCommand("workbench.action.files.newUntitledFile");
+        commands.executeCommand("workbench.action.files.newUntitledFile");
     });
 }
 
@@ -39,15 +39,15 @@ export function saveAs() {
         const handler = uri => {
                 creteDisp.dispose();
                 changeDisp.dispose();
-                vscode.workspace.openTextDocument(uri).then(doc =>
-                    vscode.window.showTextDocument(doc).then(() => resolve(true))
+                workspace.openTextDocument(uri).then(doc =>
+                    window.showTextDocument(doc).then(() => resolve(true))
                 );
             };
-        const watcher = vscode.workspace.createFileSystemWatcher("**/*", false, false, true);
+        const watcher = workspace.createFileSystemWatcher("**/*", false, false, true);
         const creteDisp = watcher.onDidCreate(handler);
         // needed in case an existing file will be overwritten
         const changeDisp = watcher.onDidChange(handler);
-        vscode.window.activeTextEditor.document.save().then(saved => {
+        window.activeTextEditor.document.save().then(saved => {
             if (!saved) {
                 creteDisp.dispose();
                 changeDisp.dispose();
@@ -58,13 +58,13 @@ export function saveAs() {
 }
 
 export function hasActiveTextEditorUntitledEmptyFile() {
-    return vscode.window.activeTextEditor
-        && vscode.window.activeTextEditor.document
-        && vscode.window.activeTextEditor.document.isUntitled
-        && isDocumentEmpty(vscode.window.activeTextEditor.document);
+    return window.activeTextEditor
+        && window.activeTextEditor.document
+        && window.activeTextEditor.document.isUntitled
+        && isDocumentEmpty(window.activeTextEditor.document);
 }
 
-export function isDocumentEmpty(document: vscode.TextDocument) {
+export function isDocumentEmpty(document: TextDocument) {
     return document.getText() === "";
 }
 
@@ -74,6 +74,6 @@ export function showTextInEditor(text: string): Thenable<void> {
         : activateNewUntitledFile();
 
     return prepareEditor.then(() => {
-        return vscode.window.activeTextEditor.edit(x => x.insert(new vscode.Position(0, 0), text));
+        return window.activeTextEditor.edit(x => x.insert(new Position(0, 0), text));
     });
 }
