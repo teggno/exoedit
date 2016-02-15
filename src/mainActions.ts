@@ -54,15 +54,17 @@ function uploadDeviceLuaScript(context: vscode.ExtensionContext) {
 export function publishMapped(context: vscode.ExtensionContext) {
     const path = vscode.window.activeTextEditor.document.fileName;
     const relativePath = vscode.workspace.asRelativePath(path);
-    return getExoeditFile().then(file => file.mappings.getUploader(relativePath))
-        .then(uploader => {
-            getExoeditFile().then(file => {
+    const workspaceRootPath = vscode.workspace.rootPath;
+    return getExoeditFile(workspaceRootPath).then(file => file.mappings.getUploader(relativePath))
+        .then(uploader =>
+            getExoeditFile(workspaceRootPath).then(file =>
                 getAccount(context).then(account => {
                     const exosite = new Exosite(file.domain, account.userName, account.password);
-                    uploader(exosite, vscode.window.activeTextEditor.document.getText());
-                });
-            });
-        });
+                    return uploader(exosite, vscode.window.activeTextEditor.document.getText());
+                })
+            )
+        )
+        .then(showUploadCompleted);
 }
 
 export function isMapped() {
@@ -70,7 +72,8 @@ export function isMapped() {
 
     const path = vscode.window.activeTextEditor.document.fileName;
     const relativePath = vscode.workspace.asRelativePath(path);
-    return getExoeditFile().then(file => file.mappings.isMapped(relativePath));
+    const workspaceRootPath = vscode.workspace.rootPath;
+    return getExoeditFile(workspaceRootPath).then(file => file.mappings.isMapped(relativePath));
 }
 
 function downloadScript(prompt: () => Thenable<ScriptSource>, context: vscode.ExtensionContext) {
@@ -103,7 +106,7 @@ function uploadScript(prompt: () => Thenable<ScriptSource>) {
                 resolve(scriptSource);
             }));
         })
-        .then(scriptSource => scriptSource.upload(vscode.window.activeTextEditor.document.getText()))
+        .then(scriptSource => scriptSource.upload(vscode.window.activeTextEditor.document.getText()).then(showUploadCompleted))
         .then(null, error => console.error(error));
 }
 
@@ -159,7 +162,7 @@ function saveAndMap(scriptSource: ScriptSource) {
 }
 
 function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
-    return getExoeditFile().then(exoeditFile => {
+    return getExoeditFile(vscode.workspace.rootPath).then(exoeditFile => {
         scriptSource.setMapping(relativeFilePath, exoeditFile.mappings);
         if (!exoeditFile.domain) exoeditFile.domain = scriptSource.domain;
         return exoeditFile.save();
@@ -167,4 +170,8 @@ function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
     .then(null, error => {
         console.error(error);
     });
+}
+
+function showUploadCompleted() {
+    vscode.window.setStatusBarMessage("Upload completed", 3000);
 }

@@ -1,4 +1,3 @@
-import * as vscode from "vscode";
 import Exosite from "./exosite";
 import * as api from "./exosite";
 
@@ -40,7 +39,7 @@ export class DomainWidgetScript implements ScriptSource {
             return exosite.getDomainWidgetScript(id)
             .then(so => {
                 so.code = newScript;
-                return exosite.updateDomainWidgetScript(id, so).then(showUploadCompleted);
+                return exosite.updateDomainWidgetScript(id, so).then(() => { return; });
             });
         };
     }
@@ -92,7 +91,6 @@ export class PortalWidgetScript implements ScriptSource {
 
                         dashboard.config.widgets[index].script = newScript;
                         exosite.updateDashboard(dashboard.id, { config: dashboard.config }).then(() => {
-                            showUploadCompleted();
                             resolve();
                         });
                     });
@@ -128,7 +126,7 @@ export class LuaScript implements ScriptSource {
 
     public static getUploader(rid: string) {
         return (exosite: Exosite, newScript: string) => {
-            return exosite.updateLuaScript(rid, newScript).then(showUploadCompleted);
+            return exosite.updateLuaScript(rid, newScript).then(() => { return; });
         };
     }
 }
@@ -137,8 +135,4 @@ export interface Mapper {
     setDomainWidgetScriptMapping: (path: string, id: string) => void;
     setPortalWidgetScriptMapping: (path: string, dashboardId: string, title: string) => void;
     setLuaDeviceScriptMapping: (path: string, rid: string) => void;
-}
-
-function showUploadCompleted() {
-    vscode.window.setStatusBarMessage("Upload completed", 3000);
 }

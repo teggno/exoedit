@@ -1,12 +1,15 @@
 "use strict";
 
-import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { MappingDto, Mappings } from "./mappings";
 
-export function getExoeditFile(): Thenable<ExoeditFile> {
-    return getExoeditFileDto().then(exoeditFileDto => new ExoeditFileImpl(exoeditFileDto));
+/**
+ * @param directory full path of the directory containing the exoedit.json file.
+ */
+export function getExoeditFile(directory: string): Thenable<ExoeditFile> {
+    const filePath = path.join(directory, "exoedit.json");
+    return getExoeditFileDto(filePath).then(exoeditFileDto => new ExoeditFileImpl(filePath, exoeditFileDto));
 }
 
 export interface ExoeditFile {
@@ -19,7 +22,7 @@ class ExoeditFileImpl implements ExoeditFile {
     private _mappings: Mappings;
     private _domain: string;
 
-    constructor(exoeditFileDto?: ExoeditFileDto) {
+    constructor(private filePath: string, exoeditFileDto?: ExoeditFileDto) {
         if (!exoeditFileDto) exoeditFileDto = {};
 
         this._mappings = exoeditFileDto.mapping
@@ -42,7 +45,7 @@ class ExoeditFileImpl implements ExoeditFile {
     }
 
     save() {
-        return getExoeditFileDto().then(dto => {
+        return getExoeditFileDto(this.filePath).then(dto => {
             if (!this._mappings.isEmpty) {
                 dto.mapping = this._mappings.Serialize();
             }
@@ -52,7 +55,7 @@ class ExoeditFileImpl implements ExoeditFile {
             }
 
             const json = JSON.stringify(dto, null, 2);
-            const filePath = getFilePath();
+            const filePath = this.filePath;
 
             return new Promise<void>((resolve, reject) => {
                 const saveCallback = err => {
@@ -77,8 +80,7 @@ class ExoeditFileImpl implements ExoeditFile {
 }
 
 
-function getExoeditFileDto() {
-    const filePath = getFilePath();
+function getExoeditFileDto(filePath: string) {
     return new Promise<ExoeditFileDto>((resolve, reject) => {
         fs.access(filePath, fs.R_OK, err => {
             if (err) return resolve({});
@@ -100,10 +102,6 @@ function getExoeditFileDto() {
             });
         });
     });
-}
-
-function getFilePath() {
-    return path.join(vscode.workspace.rootPath, "exoedit.json");
 }
 
 interface ExoeditFileDto {

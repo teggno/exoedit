@@ -61,7 +61,7 @@ export function getAccount(context: vscode.ExtensionContext) {
 
 function getDomainName() {
     return hasWorkspace()
-        ? getExoeditFile().then(file => file.domain).then(domain => domain || promptForDomainName())
+        ? getExoeditFile(vscode.workspace.rootPath).then(file => file.domain).then(domain => domain || promptForDomainName())
         : promptForDomainName();
 }
 
