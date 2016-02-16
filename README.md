@@ -47,7 +47,7 @@ The mappings of your script files to the corresponding Exosite artifacts, as wel
     "mappings":{
         "lua":{
             "device": [
-                { "path": "abc/one.lua", "rid": "abcd1234" },
+                { "path": "abc/one.lua", "rid": "abcd1234", "minify": "basic" },
                 { "path": "xy/def.lua", "rid": "ghij5678" }
             ]
         },

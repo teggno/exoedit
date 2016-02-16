@@ -55,7 +55,7 @@ export function publishMapped(context: vscode.ExtensionContext) {
     const path = vscode.window.activeTextEditor.document.fileName;
     const relativePath = vscode.workspace.asRelativePath(path);
     const workspaceRootPath = vscode.workspace.rootPath;
-    return getExoeditFile(workspaceRootPath).then(file => file.mappings.getUploader(relativePath))
+    return getExoeditFile(workspaceRootPath).then(file => file.mappings.getPublisher(relativePath))
         .then(uploader =>
             getExoeditFile(workspaceRootPath).then(file =>
                 getAccount(context).then(account => {

@@ -1,6 +1,7 @@
 import {clone} from "./utilities";
 import Exosite from "./exosite";
 import * as scriptSources from "./scriptSources";
+import { minify } from "./luaBasicMin";
 
 export class Mappings implements scriptSources.Mapper {
     private deviceLuaScriptMappings: LuaDeviceScriptMapping[] = [];
@@ -84,9 +85,16 @@ export class Mappings implements scriptSources.Mapper {
         return result;
     }
 
-    public getUploader(relativePath: string) {
+    public getPublisher(relativePath: string) {
         const luaMapping = this.find(this.deviceLuaScriptMappings, relativePath);
-        if (luaMapping) return scriptSources.LuaScript.getUploader(luaMapping.rid);
+        if (luaMapping) {
+            return (exosite: Exosite, newScript: string) => {
+                if (luaMapping.minify === "basic") {
+                    newScript = minify(newScript);
+                }
+                return scriptSources.LuaScript.getUploader(luaMapping.rid)(exosite, newScript);
+            };
+        }
 
         const domainWidgetMapping = this.find(this.domainWidgetScriptMappings, relativePath);
         if (domainWidgetMapping) return scriptSources.DomainWidgetScript.getUploader(domainWidgetMapping.id);
@@ -98,7 +106,7 @@ export class Mappings implements scriptSources.Mapper {
     }
 
     public isMapped(relativePath: string) {
-        return !!this.getUploader(relativePath);
+        return !!this.getPublisher(relativePath);
     }
 }
 
@@ -119,6 +127,7 @@ interface HasPath {
 interface LuaDeviceScriptMapping {
     path: string;
     rid: string;
+    minify?: string;
 }
 
 interface DomainWidgetScriptMapping {
