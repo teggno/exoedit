@@ -48,6 +48,7 @@ The mappings of your script files to the corresponding Exosite artifacts, as wel
         "lua":{
             "device": [
                 { "path": "abc/one.lua", "rid": "abcd1234", "minify": "basic" },
+                { "path": "abc/foo.lua", "rid": "foo123", "minify": "full" },
                 { "path": "xy/def.lua", "rid": "ghij5678" }
             ]
         },
@@ -67,6 +68,12 @@ The mappings of your script files to the corresponding Exosite artifacts, as wel
 
 **NOTE: Portal Widget scripts are mapped using their title, so the mapping gets broken if you change the widget's title in Exosite.**
 
+#### Lua script minification
+You can choose to have lua scripts minified before they are published to Exosite. To do so, you can set the (optional) `minify` property
+of the lua script's entry in exoedit.json to `basic` or `full` (see example above). 
+* **`basic`** removes comments and white space at the beginning of lines. Does not remove any lines.
+* **`full`** removes all comments, all unnecessary white space (including new line) and gives variables shorter names.
+
 ### Single File Mode
 When you have not opened a folder in Visual Studio Code (i.e. you have just opened a file or nothing at all), the extension works in single file mode.
 
@@ -75,4 +82,3 @@ When you have not opened a folder in Visual Studio Code (i.e. you have just open
 * Credentials always have to be entered.
 * All 3 download actions are available.
 * All 3 upload actions are available.
-

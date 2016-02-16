@@ -9,11 +9,15 @@
     "url": "http://blogs.adwise.ch/baer"
   },
   "galleryBanner": {
-        "color": "#C2CE24",
-        "theme": "dark"
+    "color": "#C2CE24",
+    "theme": "dark"
   },
   "icon": "images/icon.png",
-  "keywords": ["exosite", "widget", "lua"],
+  "keywords": [
+    "exosite",
+    "widget",
+    "lua"
+  ],
   "license": "MIT",
   "engines": {
     "vscode": "^0.10.6"
@@ -50,6 +54,7 @@
     "vscode": "^0.11.x"
   },
   "dependencies": {
+    "luamin": "^1.0.0",
     "request": "^2.69.0"
   },
   "homepage": "https://github.com/teggno/exoedit",

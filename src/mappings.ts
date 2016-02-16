@@ -2,6 +2,7 @@ import {clone} from "./utilities";
 import Exosite from "./exosite";
 import * as scriptSources from "./scriptSources";
 import { minify } from "./luaBasicMin";
+const luamin = require("luamin");
 
 export class Mappings implements scriptSources.Mapper {
     private deviceLuaScriptMappings: LuaDeviceScriptMapping[] = [];
@@ -91,6 +92,9 @@ export class Mappings implements scriptSources.Mapper {
             return (exosite: Exosite, newScript: string) => {
                 if (luaMapping.minify === "basic") {
                     newScript = minify(newScript);
+                }
+                else if (luaMapping.minify === "full") {
+                    newScript = luamin.minify(newScript);
                 }
                 return scriptSources.LuaScript.getUploader(luaMapping.rid)(exosite, newScript);
             };
