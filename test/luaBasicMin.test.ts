@@ -32,6 +32,12 @@ suite("Basic Lua Minifier tests", () => {
             "first line\nsecond line after white space\nthird line");
     });
 
+    test("Keeps newline in multi line connments", () => {
+        assert.equal(sut.minify(
+            "first --[[line\nsecond line\nthird]] line"),
+            "first \n\n line");
+    });
+
     test("Keeps single line comments in string literals", () => {
         const code = "before the string literal \" in the string --literal \n\" after the string literal";
         assert.equal(sut.minify(code), code);

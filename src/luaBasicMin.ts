@@ -72,7 +72,7 @@ export function minify(luaCode: string): string {
             isInRemovableWhiteSpace = false;
             skipThisChar = true;
         }
-        if (!skipThisChar && !isInSingleLineComment && !isInMultiLineComment && !isInRemovableWhiteSpace) {
+        if (!skipThisChar && !isInSingleLineComment && (!isInMultiLineComment || luaCode[index] === newLine) && !isInRemovableWhiteSpace) {
             result.push(luaCode[index]);
         }
     }
