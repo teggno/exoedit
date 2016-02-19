@@ -52,7 +52,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "node ./node_modules/vscode/bin/compile -p ./ & node ./node_modules/vscode/bin/compile -p ./widgetDebugging",
+    "vscode:prepublish": "node ./node_modules/vscode/bin/compile -p ./ & node ./node_modules/vscode/bin/compile -p ./widgetClient",
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {

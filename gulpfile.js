@@ -9,8 +9,8 @@ gulp.task('compileExtension', function(cb) {
   });
 });
 
-gulp.task('compileWidgetDebugging', function(cb) {
-  exec('node ./node_modules/vscode/bin/compile -p ./widgetDebugging', function (err, stdout, stderr) {
+gulp.task('compileWidgetClient', function(cb) {
+  exec('node ./node_modules/vscode/bin/compile -p ./widgetClient', function (err, stdout, stderr) {
     console.log(stdout);
     console.log(stderr);
     cb();
@@ -19,10 +19,10 @@ gulp.task('compileWidgetDebugging', function(cb) {
 
 gulp.task('watch', function(){
     gulp.watch('./src/**/*', ['compileExtension']); 
-    gulp.watch('./widgetDebugging/src/**/*', ['compileWidgetDebugging']); 
+    gulp.watch('./widgetClient/src/**/*', ['compileWidgetClient']); 
 });
 
-gulp.task('compile', ['compileExtension', 'compileWidgetDebugging'], function(){
+gulp.task('compile', ['compileExtension', 'compileWidgetClient'], function(){
 });
 
  

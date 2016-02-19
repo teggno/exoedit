@@ -4,6 +4,7 @@ import { readFile } from "fs";
 import read from "./read";
 import portal from "./portal";
 import liveReload from "./liveReload";
+import log from "./log";
 
 export function runWidget(path: string, context: ExtensionContext ) {
     const handlers = getHandlers(path, context);
@@ -26,27 +27,26 @@ export function runWidget(path: string, context: ExtensionContext ) {
 
     server.listen("8080");
 
-    const channel = window.createOutputChannel("Exoedit Widget Server");
-    channel.show();
-    channel.appendLine("Exoedit Widget Server started listeing on port 8080. Open the url http://localhost:8080");
+    log("Exoedit Widget Server started listeing on port 8080. Open the url http://localhost:8080");
 
     return {
         stop: () => {
+            if (stopped) return;
             stopped = true;
             server.close();
-            channel.appendLine("Exoedit Widget Server stopped");
+            log("Exoedit Widget Server stopped");
         }
     };
 }
 
 function getHandlers(widgetPath: string, context: ExtensionContext) {
     return [
-        { url: "/", handle: serveStaticFile("widgetDebugging/index.html", "text/html") },
+        { url: "/", handle: serveStaticFile("widgetClient/index.html", "text/html") },
         { url: "/require.js", handle: serveScript("node_modules/requirejs/require.js") },
         { url: "/fetch.js", handle: serveScript("node_modules/whatwg-fetch/fetch.js") },
         { url: "/promise.js", handle: serveScript("node_modules/es6-promise/dist/es6-promise.min.js") },
-        { url: "/exositeFake.js", handle: serveScript("widgetDebugging/out/exositeFake.js") },
-        { url: "/liveReload.js", handle: serveScript("widgetDebugging/out/liveReloadLongPoll.js") },
+        { url: "/exositeFake.js", handle: serveScript("widgetClient/out/exositeFake.js") },
+        { url: "/liveReload.js", handle: serveScript("widgetClient/out/liveReloadLongPoll.js") },
         { url: "/widget.js", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(widgetPath, (err, widgetScript) => {
             response.setHeader("content-type", "text/javascript");
             const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;

@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { readToEnd, jsonResponse, ensurePost } from "./widgetServerUtilities";
+import log from "./log";
 
 export default function (request: IncomingMessage, response: ServerResponse) {
     if (!ensurePost(request, response)) return;
@@ -17,6 +18,7 @@ export default function (request: IncomingMessage, response: ServerResponse) {
             return;
         }
 
+        log("Faking the data for the read() function");
         jsonResponse(response, [[123, "Something from exosite"], [456, "another thing from exosite"]]);
         // TODO: get stuff from exosite and write it to the response
     });
