@@ -1,10 +1,11 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { readToEnd, jsonResponse, ensurePost } from "./widgetServerUtilities";
 import { getExoeditFile } from "../exoeditFile";
+import { workspace } from "vscode";
 
 export default function factory(widgetPath: string) {
     return (request: IncomingMessage, response: ServerResponse) => {
-        getExoeditFile().then(file => {
+        getExoeditFile(workspace.rootPath).then(file => {
             // get mapping for widgetPath
             // get dashboard
             // get widget
@@ -14,7 +15,7 @@ export default function factory(widgetPath: string) {
             // TODO: get stuff from exosite and write it to the response
             jsonResponse(response, { clients: [ { dataports: [ { alias: "foobar", data: [[123, "the value"]]} ] }]});
         });
-    }
+    };
 }
 
 interface ReadBody {

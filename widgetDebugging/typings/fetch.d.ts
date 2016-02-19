@@ -3,6 +3,7 @@ declare namespace ftch {
         json(): Promise<any>;
         text(): Promise<string>;
         ok: boolean;
+        status: number;
     }
     interface FetchOptions {
         method?: string;
@@ -10,7 +11,7 @@ declare namespace ftch {
         body?: string;
     }
     export interface FetchFn {
-        (url: string, options: FetchOptions): Promise<Response>;
+        (url: string, options?: FetchOptions): Promise<Response>;
     }
 }
 declare var fetch: ftch.FetchFn;

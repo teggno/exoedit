@@ -37,7 +37,7 @@ let server: { stop: () => void };
 function registerRunWidgetCommand(context: ExtensionContext) {
     context.subscriptions.push(commands.registerTextEditorCommand("exoedit.runWidget", () => {
         isMapped().then(result => {
-            if (result){
+            if (result) {
                 if (server) server.stop();
                 server = runWidget(window.activeTextEditor.document.fileName, context);
             }

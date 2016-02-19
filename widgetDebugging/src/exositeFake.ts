@@ -1,4 +1,5 @@
 ///<reference path="../typings/fetch.d.ts" />
+///<reference path="../typings/es6-promise.d.ts" />
 
 interface ReadOptions {
     starttime: number;
