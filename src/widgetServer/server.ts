@@ -46,7 +46,7 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
         { url: "/fetch.js", handle: serveScript("node_modules/whatwg-fetch/fetch.js") },
         { url: "/promise.js", handle: serveScript("node_modules/es6-promise/dist/es6-promise.min.js") },
         { url: "/exositeFake.js", handle: serveScript("widgetClient/out/exositeFake.js") },
-        { url: "/liveReload.js", handle: serveScript("widgetClient/out/liveReloadLongPoll.js") },
+        { url: "/liveReload.js", handle: serveScript("widgetClient/out/liveReload.js") },
         { url: "/widget.js", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(widgetPath, (err, widgetScript) => {
             response.setHeader("content-type", "text/javascript");
             const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;
