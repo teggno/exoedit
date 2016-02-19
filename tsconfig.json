@@ -8,6 +8,6 @@
 	},
 	"exclude": [
 		"node_modules",
-        "widgetDebugging"//excluded because will be compiled separately
+        "widgetDebugging"
 	]
 }

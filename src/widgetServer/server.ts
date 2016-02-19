@@ -39,70 +39,34 @@ export function runWidget(path: string, context: ExtensionContext ) {
     };
 }
 
-const divContainerId = "container";
-
-const fetchScript = "<script src=\"fetch\"></script>";
-const promiseScript = "<script src=\"promise\"></script>";
-
-const liveReloadLongPollScript = "<script src=\"liveReloadLongPoll\"></script>";
-
-const exositeFakeScript = "<script src=\"exositeFake\"></script>";
-
-const mainScript = `
-<script src="requirejs"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function(event) { 
-        require(['widget'], function(widget) {
-            fetch('portal').then(function(response){
-                response.json().then(function(portal){
-                    widget(document.getElementById('${divContainerId}'), portal);
-                });
-            });
-        });
-    });
-</script>`;
-
-const indexHtml =
-    `<!DOCTYPE html>
-<html>
-<head>${fetchScript}${promiseScript}${mainScript}${liveReloadLongPollScript}</head>
-<body><div id="${divContainerId}"></div>
-</body>
-</html>`;
-
 function getHandlers(widgetPath: string, context: ExtensionContext) {
     return [
-        { url: "/", handle: (request: http.IncomingMessage, response: http.ServerResponse) => {
-            response.setHeader("content-type", "text/html");
-            response.end(indexHtml);
-        }},
-        { url: "/requirejs", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(context.asAbsolutePath("node_modules/requirejs/require.js"), (err, data) => {
-            response.setHeader("content-type", "text/javascript");
-            response.end(data);
-        })},
-        { url: "/fetch", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(context.asAbsolutePath("node_modules/whatwg-fetch/fetch.js"), (err, data) => {
-            response.setHeader("content-type", "text/javascript");
-            response.end(data);
-        })},
-        { url: "/promise", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(context.asAbsolutePath("node_modules/es6-promise/dist/es6-promise.min.js"), (err, data) => {
-            response.setHeader("content-type", "text/javascript");
-            response.end(data);
-        })},
-        { url: "/exositeFake.js", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(context.asAbsolutePath("widgetDebugging/out/exositeFake.js"), (err, data) => {
-            response.setHeader("content-type", "text/javascript");
-            response.end(data);
-        })},
-        { url: "/liveReloadLongPoll", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(context.asAbsolutePath("widgetDebugging/out/liveReloadLongPoll.js"), (err, data) => {
-            response.setHeader("content-type", "text/javascript");
-            response.end(data);
-        })},
+        { url: "/", handle: serveStaticFile("widgetDebugging/index.html", "text/html") },
+        { url: "/require.js", handle: serveScript("node_modules/requirejs/require.js") },
+        { url: "/fetch.js", handle: serveScript("node_modules/whatwg-fetch/fetch.js") },
+        { url: "/promise.js", handle: serveScript("node_modules/es6-promise/dist/es6-promise.min.js") },
+        { url: "/exositeFake.js", handle: serveScript("widgetDebugging/out/exositeFake.js") },
+        { url: "/liveReload.js", handle: serveScript("widgetDebugging/out/liveReloadLongPoll.js") },
         { url: "/widget.js", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(widgetPath, (err, widgetScript) => {
             response.setHeader("content-type", "text/javascript");
-            const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; return ${widgetScript.toString()};});`;
+            const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;
             response.end(newScript);
         })},
         { url: "/read", handle: read },
         { url: "/portal", handle: portal(widgetPath) },
         { url: "/liveReload", handle: liveReload(widgetPath) }
     ];
+
+    function serveScript(workspaceRelativePath: string) {
+        return serveStaticFile(workspaceRelativePath, "text/javascript");
+    }
+
+    function serveStaticFile(workspaceRelativePath: string, contentType: string) {
+        return (request: http.IncomingMessage, response: http.ServerResponse) => {
+            readFile(context.asAbsolutePath(workspaceRelativePath), (err, file) => {
+                response.setHeader("content-type", contentType);
+                response.end(file);
+            });
+        };
+    }
 }

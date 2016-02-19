@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--3rd party scripts-->
+<script src="fetch.js"></script>
+<script src="promise.js"></script>
+<script src="require.js"></script>
+<!--own scripts-->
+<script src="liveReload.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) { 
+        require(['widget'], function(widget) {
+            fetch('portal').then(function(response){
+                response.json().then(function(portal){
+                    widget(document.getElementById('container'), portal);
+                });
+            });
+        });
+    });
+</script>
+</head>
+<body>
+    <div id="container"></div>
+</body>
+</html>
