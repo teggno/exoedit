@@ -1,10 +1,13 @@
-import {clone} from "./utilities";
-import Exosite from "./exosite";
-import * as scriptSources from "./scriptSources";
-import { minify } from "./luaBasicMin";
+import { clone } from "../utilities";
+import { minify } from "../luaBasicMin";
+import Exosite from "../exosite";
+import { Mapper } from "./mapper";
+import { DomainWidgetScript, LuaScript } from "./portals";
+import { PortalWidgetScript } from "./dashboards";
+
 const luamin = require("luamin");
 
-export class Mappings implements scriptSources.Mapper {
+export class Mappings implements Mapper {
     private deviceLuaScriptMappings: LuaDeviceScriptMapping[] = [];
     private domainWidgetScriptMappings: DomainWidgetScriptMapping[] = [];
     private portalWidgetScriptMappings: PortalWidgetScriptMapping[] = [];
@@ -96,17 +99,24 @@ export class Mappings implements scriptSources.Mapper {
                 else if (luaMapping.minify === "full") {
                     newScript = luamin.minify(newScript);
                 }
-                return scriptSources.LuaScript.getUploader(luaMapping.rid)(exosite, newScript);
+                return LuaScript.getUploader(luaMapping.rid)(exosite, newScript);
             };
         }
 
         const domainWidgetMapping = this.find(this.domainWidgetScriptMappings, relativePath);
-        if (domainWidgetMapping) return scriptSources.DomainWidgetScript.getUploader(domainWidgetMapping.id);
+        if (domainWidgetMapping) return DomainWidgetScript.getUploader(domainWidgetMapping.id);
 
         const portalWidgetMapping = this.find(this.portalWidgetScriptMappings, relativePath);
-        if (portalWidgetMapping) return scriptSources.PortalWidgetScript.getUploader(portalWidgetMapping.dashboardId, portalWidgetMapping.widgetTitle);
+        if (portalWidgetMapping) return PortalWidgetScript.getUploader(portalWidgetMapping.dashboardId, portalWidgetMapping.widgetTitle);
 
         return undefined;
+    }
+
+    public getWidgetPortalArg(relativePath: string, live: (dashboardId: string, widgetTitle: string) => void, file: () => void ) {
+        const portalWidgetMapping = this.find(this.portalWidgetScriptMappings, relativePath);
+        if (portalWidgetMapping) return live(portalWidgetMapping.dashboardId, portalWidgetMapping.widgetTitle);
+
+        throw "Only portal widget is currently supported";
     }
 
     public isMapped(relativePath: string) {

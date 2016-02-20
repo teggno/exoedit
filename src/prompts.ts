@@ -1,12 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {showObjectQuickPick, hasWorkspace} from "./vscodeUtilities";
+import { showObjectQuickPick, hasWorkspace } from "./vscodeUtilities";
 import settingsFactory from "./settings";
-import {Account} from "./settings";
+import { Account } from "./settings";
 import Exosite from "./exosite";
-import * as domainModel from  "./domainModel";
 import { getExoeditFile } from "./exoeditFile";
+import { Domain } from "./domainModel/portals";
 
 export function promptForPortalWidget(context: vscode.ExtensionContext) {
     return promptForPortal(context)
@@ -35,7 +35,7 @@ function promptForPortal(context: vscode.ExtensionContext) {
         .then(portals => showObjectQuickPick(portals, p => p.name, {placeHolder: "Portal"}));
 }
 
-function getDomain(context: vscode.ExtensionContext) {
+export function getDomain(context: vscode.ExtensionContext) {
     let account: Account;
 
     return getAccount(context)
@@ -47,7 +47,7 @@ function getDomain(context: vscode.ExtensionContext) {
         .then(domainName => {
             if (!domainName) return undefined;
             const exosite = new Exosite(domainName, account.userName, account.password);
-            return new domainModel.Domain(domainName, exosite);
+            return new Domain(domainName, exosite);
         });
 }
 

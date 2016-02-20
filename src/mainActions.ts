@@ -3,11 +3,11 @@
 import * as vscode from "vscode";
 import { showTextInEditor, hasWorkspace, saveAs, isDocumentEmpty } from "./vscodeUtilities";
 import { promptForPortalWidget, promptForDomainWidget, promptForDeviceLuaScript, getAccount } from "./prompts";
-import { ScriptSource } from "./scriptSources";
 import settingsFactory from "./settings";
-import { Mappings } from "./mappings";
 import { getExoeditFile } from "./exoeditFile";
 import Exosite from "./exosite";
+import { ScriptSource } from "./domainModel/mapper";
+import { Mappings } from "./domainModel/mappings";
 
 export function getMainActions() {
     const actionPromises = [

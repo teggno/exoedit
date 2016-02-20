@@ -17,3 +17,14 @@ export function concatWithSlash(part1: string, part2: string) {
 
     return part1 + "/" + part2;
 }
+
+/**
+ * Returns a map with the original array elements as values and the value returned by iteratee
+ * as keys (see lodash's keyBy doc).
+ */
+export function keyBy<T extends {}>(array: Array<T>, iteratee: (item: T) => string) {
+    return < { [key: string]: T}>array.reduce((prev, current) => {
+        prev[iteratee(current)] = current;
+        return prev;
+    }, {});
+}

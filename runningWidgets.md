@@ -1,15 +1,15 @@
-# Running Widget Scripts from Exoedit
+# Running Widget Scripts
 With Exoedit you can run your widget scripts without having to publish them to Exosite. This might be helpful during development and testing.
 
 ## Providing Data to the Widget Scripts
-Each widget script consists of a function that is called with **two arguments**: 
+In Exosite, a widget script consists of a function that is called with **two arguments:**
 * `container`, the html element that will contain the widget's markup
 * `portal`, an object containing contextual data for the widget
 
-When running the widget script outside of Exosite, a page to contain the widget will be generated. This page will contain a `div` element that will be 
+When running a widget script, Exoedit generates a page to contain the widget. This page will contain a `div` element that will be 
 passed as the `container` argument, so you don't have to worry about that.
 
-What will be passed as the portal argument **depends on the type of widget**:
+What will be passed as the `portal` argument **depends on the type of widget**:
 ### Domain Widgets
 These are widgets that are globally defined in your Exosite domain.
 

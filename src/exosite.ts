@@ -30,10 +30,22 @@ export default class{
             });
     }
 
-    public getPortals(userId: number): Promise<Portal[]> {
+    public getPortals(userId: number): Promise<UserPortal[]> {
         const options = {
             auth: this.account,
             url: this.getUrl("users/" + userId.toString() + "/portals")
+        };
+        return fetch(options)
+            .then(expectStatus200)
+            .then(result => {
+                return JSON.parse(result.body);
+            });
+    }
+
+    public getPortal(portalId: string): Promise<Portal> {
+        const options = {
+            auth: this.account,
+            url: this.getUrl(`portals/${portalId}`)
         };
         return fetch(options)
             .then(expectStatus200)
@@ -78,7 +90,7 @@ export default class{
             .then(expectStatus200);
     }
 
-    public getDashboards(portalId: string): Promise<Dashboard[]> {
+    public getDashboards(portalId: string): Promise<ExositeDashboard[]> {
         const options = {
             auth: this.account,
             url: this.getUrl("portals/" + portalId + "/dashboards")
@@ -103,7 +115,7 @@ export default class{
             .then(expectStatus200);
     }
 
-    public getDashboard(dashboardId: string): Thenable<Dashboard> {
+    public getDashboard(dashboardId: string): Promise<ExositeDashboard> {
         const options = {
             auth: this.account,
             url: this.getUrl("dashboards/" + dashboardId)
@@ -115,7 +127,7 @@ export default class{
             });
     }
 
-    public getDevices(portalId: string): Thenable<Device[]> {
+    public getDevices(portalId: string): Promise<Device[]> {
         const options = {
             auth: this.account,
             url: this.getUrl("portals/" + portalId + "/devices")
@@ -127,7 +139,7 @@ export default class{
             });
     }
 
-    public getDeviceLuaScripts(deviceRid: string): Thenable<LuaScript[]> {
+    public getDeviceLuaScripts(deviceRid: string): Promise<LuaScript[]> {
         const options = {
             auth: this.account,
             url: this.getUrl("devices/" + deviceRid + "/scripts")
@@ -163,16 +175,35 @@ export default class{
         return fetch(options)
             .then(expectStatus200);
     }
+
+    public getDataSources(rids: string[]): Promise<DataSource[]> {
+        const options = {
+            auth: this.account,
+            url: this.getUrl(`/users/_this/data-sources/[${rids.join(",")}]`)
+        };
+        return fetch(options)
+            .then(expectStatus200)
+            .then(result => {
+                return <DataSource[]>JSON.parse(result.body);
+            });
+    }
 }
 
-export interface Portal {
+export interface UserPortal {
     PortalName: string;
     PortalID: string;
 }
 
-export interface Dashboard {
+export interface Portal {
+    info: {
+        key: string;
+    };
+}
+
+export interface ExositeDashboard {
     id: string;
     name: string;
+    portalId: string;
     config: {
         widgets: {[id: number]: DashboardWidget}
     };
@@ -186,6 +217,17 @@ export interface DashboardWidget {
      * Contains the rids of the dataports that have been selected for the widget.
      */
     rids: string[];
+    limit: {
+        /**
+         * count|duration
+         */
+        type: string;
+        /**
+         * minute|hour|day|week
+         */
+        unit: string;
+        value: number;
+    };
 }
 
 
@@ -201,9 +243,15 @@ export interface Device {
     info: {
         description: {
             name: string;
+            meta: string;
+            public: boolean;
         }
     };
     sn: string;
+    /**
+     * rids of the device' data sources
+     */
+    dataSources: string[];
 }
 
 export interface LuaScript {
@@ -215,5 +263,39 @@ export interface LuaScript {
                 script: string;
             }
         }
+    };
+}
+
+export interface DataSource {
+    data: [[number, any]];
+    rid: string;
+    unit: string;
+    info: {
+        basic: {
+            modified: number;
+            subscribers: number;
+            type: string;
+        };
+        description: {
+            format: string;
+            meta: string;
+            name: string;
+            preprocess: any[];
+            public: boolean;
+            retention: {
+                count: string;
+                duration: string;
+            };
+            subscribe: string;
+        };
+        shares: any[];
+        storage: {
+            count: number;
+            first: number;
+            last: number;
+            size: number;
+        };
+        subscribers: any[];
+        tags: any[];
     };
 }

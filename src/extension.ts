@@ -1,9 +1,10 @@
 "use strict";
 
-import { commands, ExtensionContext, window } from "vscode";
+import { commands, ExtensionContext, window, Position } from "vscode";
 import { getMainActions, isMapped, publishMapped } from "./mainActions";
-import { showObjectQuickPick} from "./vscodeUtilities";
+import { showObjectQuickPick, activateNewUntitledFile } from "./vscodeUtilities";
 import { runWidget } from "./widgetServer/server";
+import { promptForPortalWidget } from "./prompts";
 
 // this method is called when the extension is activated
 // your extension is activated the very first time the command is executed
@@ -15,6 +16,7 @@ export function activate(context: ExtensionContext) {
     registerPublishCommand(context);
     registerRunWidgetCommand(context);
     registerStopServerCommand(context);
+    registerGetPortalsArgumentCommand(context);
 }
 
 function registerListActionsCommand(context: ExtensionContext) {
@@ -54,6 +56,22 @@ function registerStopServerCommand(context: ExtensionContext) {
         }
     }));
 }
+
+function registerGetPortalsArgumentCommand(context: ExtensionContext) {
+    context.subscriptions.push(commands.registerCommand("exoedit.getPortalsArgument", () => {
+        promptForPortalWidget(context)
+            .then(widget => widget.getPortalArgument())
+            .then(portalArg => {
+                activateNewUntitledFile().then(() => {
+                    window.activeTextEditor.edit(edit => {
+                        edit.insert(new Position(0, 0), JSON.stringify(portalArg, null, 2));
+                    });
+                });
+            });
+    }));
+}
+
+
 
 // this method is called when the extension is deactivated
 export function deactivate() {

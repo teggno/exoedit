@@ -2,7 +2,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { MappingDto, Mappings } from "./mappings";
+import { MappingDto, Mappings } from "./domainModel/mappings";
 
 /**
  * @param directory full path of the directory containing the exoedit.json file.

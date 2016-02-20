@@ -1,15 +1,15 @@
-import * as http from "http";
+import { createServer, IncomingMessage, ServerResponse } from "http";
 import { window, ExtensionContext } from "vscode";
 import { readFile } from "fs";
+import log from "./log";
 import read from "./read";
 import portal from "./portal";
 import liveReload from "./liveReload";
-import log from "./log";
 
 export function runWidget(path: string, context: ExtensionContext ) {
     const handlers = getHandlers(path, context);
     let stopped = false;
-    const server = http.createServer((request, response) => {
+    const server = createServer((request, response) => {
         if (stopped) {
             response.statusCode = 200;
             response.end("ServerStopped");
@@ -47,13 +47,13 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
         { url: "/promise.js", handle: serveScript("node_modules/es6-promise/dist/es6-promise.min.js") },
         { url: "/exositeFake.js", handle: serveScript("widgetClient/out/exositeFake.js") },
         { url: "/liveReload.js", handle: serveScript("widgetClient/out/liveReload.js") },
-        { url: "/widget.js", handle: (request: http.IncomingMessage, response: http.ServerResponse) => readFile(widgetPath, (err, widgetScript) => {
+        { url: "/widget.js", handle: (request: IncomingMessage, response: ServerResponse) => readFile(widgetPath, (err, widgetScript) => {
             response.setHeader("content-type", "text/javascript");
             const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;
             response.end(newScript);
         })},
         { url: "/read", handle: read },
-        { url: "/portal", handle: portal(widgetPath) },
+        { url: "/portal", handle: portal(widgetPath, context) },
         { url: "/liveReload", handle: liveReload(widgetPath) }
     ];
 
@@ -62,7 +62,7 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
     }
 
     function serveStaticFile(workspaceRelativePath: string, contentType: string) {
-        return (request: http.IncomingMessage, response: http.ServerResponse) => {
+        return (request: IncomingMessage, response: ServerResponse) => {
             readFile(context.asAbsolutePath(workspaceRelativePath), (err, file) => {
                 response.setHeader("content-type", contentType);
                 response.end(file);
