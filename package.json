@@ -51,7 +51,7 @@
       },
       {
         "command": "exoedit.getPortalsArgument",
-        "title": "Exoedit: Get data for a widget's \"portals\" argument"
+        "title": "Exoedit: Get data for a widget's \"portal\" argument"
       }
     ]
   },

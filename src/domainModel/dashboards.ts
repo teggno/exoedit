@@ -47,104 +47,13 @@ export class PortalWidgetScript implements ScriptSource {
     }
 
     /**
-     * Gets the object that can be used as the argument "porta" for the client side widget function.
+     * Gets the object that can be used as the argument "portal" for the client side widget function.
      */
     public getPortalArgument() {
         return this.exosite.getPortal(this.config.dashboard.portalId)
             .then(portal => {
                 return getWidgetPortalArg(portal.info.key, this.config.dataSourceRids, this.config.limit);
             });
-    }
-
-    public getDataSources() {
-        const getDataSources = this.exosite.getDataSources(this.config.dataSourceRids);
-        const getDevices = this.exosite.getDevices(this.config.dashboard.portalId);
-        return Promise.all(<any>[getDataSources, getDevices]).then(results => {
-            const combined = combine(<api.DataSource[]>results[0], <api.Device[]>results[1]);
-            const result: Device[] = [];
-            for (let rid in combined) {
-                result.push(combined[rid]);
-            }
-            return result;
-        });
-
-        function combine(dataSources: api.DataSource[], devices: api.Device[]) {
-            const devicesByDataSourceRid = byDataSourceRid(devices);
-            return dataSources.reduce((prev, current) => {
-                const device = devicesByDataSourceRid[current.rid];
-                const existing = prev[device.rid];
-                const dataSource = createDataSource(current);
-                if (existing) {
-                    existing. dataSources.push(dataSource);
-                }
-                else {
-                    let newDevice = createDevice(device);
-                    newDevice.dataSources.push(dataSource);
-                    prev[device.rid] = newDevice;
-                }
-                return prev;
-            }, <{ [deviceRid: string]: Device }>{});
-        }
-
-        function createDevice(source: api.Device): Device {
-            return {
-                rid: source.rid,
-                alias: "",
-                name: source.info.description.name,
-                meta: source.info.description.meta,
-                public: source.info.description.public,
-                dataSources: [],
-            };
-        }
-
-        interface Device {
-            rid: string;
-            alias: string;
-            name: string;
-            meta: string;
-            public: boolean;
-            dataSources: DataSource[];
-        }
-
-        function createDataSource(source: api.DataSource): DataSource {
-            return {
-                rid: source.rid,
-                alias: "",
-                format: source.info.description.format,
-                meta: source.info.description.meta,
-                name: source.info.description.name,
-                preprocess: source.info.description.preprocess,
-                public: source.info.description.public,
-                retention: source.info.description.retention,
-                subscribe: source.info.description.subscribe,
-                data: source.data
-            };
-        }
-
-        interface DataSource {
-            rid: string;
-            alias: string;
-            format: string;
-            meta: string;
-            name: string;
-            preprocess: any[];
-            public: boolean;
-            retention: {
-                count: string;
-                duration: string;
-            };
-            subscribe: string;
-            data: [
-                [number, string]
-            ];
-        }
-
-        function byDataSourceRid(devices: api.Device[]) {
-            return devices.reduce((prev, current) => {
-                current.dataSources.forEach(dataSourceRid => prev[dataSourceRid] = current);
-                return prev;
-            }, <{[dataSourceRid: string]: api.Device}>{});
-        }
     }
 
     private static findWidgetIndexByTitle(dashboard: api.ExositeDashboard, title: string) {
