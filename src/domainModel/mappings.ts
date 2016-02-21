@@ -112,11 +112,18 @@ export class Mappings implements Mapper {
         return undefined;
     }
 
-    public getWidgetPortalArg(relativePath: string, live: (dashboardId: string, widgetTitle: string) => void, file: () => void ) {
+    public getWidgetPortalArg(relativePath: string, live: (dashboardId: string, widgetTitle: string) => void, fake: () => void ) {
         const portalWidgetMapping = this.find(this.portalWidgetScriptMappings, relativePath);
-        if (portalWidgetMapping) return live(portalWidgetMapping.dashboardId, portalWidgetMapping.widgetTitle);
+        if (portalWidgetMapping) {
+            return portalWidgetMapping.fake
+                ? fake()
+                : live(portalWidgetMapping.dashboardId, portalWidgetMapping.widgetTitle);
+        }
 
-        throw "Only portal widget is currently supported";
+        const domainWidgetMapping = this.find(this.domainWidgetScriptMappings, relativePath);
+        if (domainWidgetMapping) {
+            return fake();
+        }
     }
 
     public isMapped(relativePath: string) {
@@ -153,4 +160,5 @@ interface PortalWidgetScriptMapping {
     path: string;
     dashboardId: string;
     widgetTitle: string;
+    fake?: boolean;
 }

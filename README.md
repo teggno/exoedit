@@ -69,11 +69,11 @@ The mappings of your script files to the corresponding Exosite artifacts, as wel
         "widget": {
             "domain": [
                 { "path": "some/script1.js", "id": "1234567" },
-                { "path": "script2.js", "id": "8474987", "run": "fake" }
+                { "path": "script2.js", "id": "8474987" }
             ],
             "portal": [
                 { "path": "foo/barscript.js", "dashboardId": "1234567", "widgetTitle": "This is the title" },
-                { "path": "foo/bazscript.js", "dashboardId": "243242", "widgetTitle": "Another title", "run": "fake" }
+                { "path": "foo/bazscript.js", "dashboardId": "243242", "widgetTitle": "Another title", "fake": true }
             ]
         }
     }

@@ -21,14 +21,11 @@ Portal widgets are created on a dashboard.
 Portal Widgets can be run with live and fake data. If you do not configure anything, they will display live data.
 
 ### Displaying Fake Data
-If you want to display fake data, you can add the property `run` with the value `fake` to the widget's entry in the `exoedit.json` file.
+If you want to display fake data for a portal widget, you can add the property `fake` with the value `true` to the widget's entry in the `exoedit.json` file. (Domain widgets do not need this configuration because they cannot display live data.)
 ```json
-// Example for a Domain Widget
-{ "path": "MyDomainWidget.js", "id": "8474987", "run": "fake" }
-// Example for a Portal Widget
-{ "path": "SomeFolder/MyPortalWidget.js", "dashboardId": "243242", "widgetTitle": "Awsome Widget", "run": "fake" }
+{ "path": "SomeFolder/MyPortalWidget.js", "dashboardId": "243242", "widgetTitle": "Awsome Widget", "fake": true }
 ```
-The Widget then expects a file that is in the same folder and has the same name as the Widget's Script but the file extension `.json` instead of `.js`. This file needs to contain a JSON object that has the structure of the Widget's `portal` argument (see http://docs.exosite.com/widget/). Exoedit can help you creating such a file as follows:
+The Widget then expects a file that is in the same folder and has the same name as the Widget's Script but the file extension `.json` instead of `.js`. This file needs to contain a JSON object that has the structure of the Widget's `portal` argument (see http://docs.exosite.com/widget/). Exoedit can help you create such a file as follows:
 
 1. Open the command list (by pressing F1 or Ctrl+Shift+P)
 2. Select `Exoedit: Get data for a widget's "portal" argument`
