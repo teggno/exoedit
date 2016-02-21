@@ -49,7 +49,7 @@ Here's how it works:
 4. Your browser will display a page containing the widget. When you edit and save the widget in vscode, the browser will automatically reload.
 5. When you have finished editing the widget, it's best to stop the http server with the command `Exoedit: Stop Widget Server`.
 
-For more information on how to configure the widget to display live or fake data, see [Running Widgets](./RunningWidgets).
+For more information on how to configure the widget to display live or fake data, see [Running Widgets](./RunningWidgets.md).
 
 ## Script Mapping
 The mappings of your script files to the corresponding Exosite artifacts, as well as the Exosite domain, are stored in the file `exoedit.json`.
