@@ -40,9 +40,10 @@ of the Lua script's entry in `exoedit.json (see below) to `basic` or `full` (see
 ### Run widget outside of Exosite
 **This feature is only available if you are in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
 
-During development and for testing, Exoedit allows you to run widgets (with live or fake data) outside of Exosite.
+With the help of Exoedit, you can run widgets (with live or fake data) outside of Exosite. This is convenient while developing and testing widgets.
 
 Here's how it works:
+
 1. Open the command list (by pressing F1 or Ctrl+Shift+P)
 2. Select `Exoedit: Run Script`
 3. Click on the link that's beeing displayed (Ctrl+Click)
@@ -52,7 +53,7 @@ Here's how it works:
 For more information on how to configure the widget to display live or fake data, see [Running Widgets](./RunningWidgets.md).
 
 ## Script Mapping
-The mappings of your script files to the corresponding Exosite artifacts, as well as the Exosite domain, are stored in the file `exoedit.json`.
+Exoedit stores the mappings of your script files to the corresponding Exosite artifacts and the Exosite domain in the file `exoedit.json`.
 
 **JSON Example**
 ```json
