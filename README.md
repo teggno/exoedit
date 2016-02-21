@@ -30,7 +30,7 @@ When you have an open file, you can use Exoedit to upload it to Exosite. **Depen
 4. The status bar will indicate when the script has been published.
 
 ### Lua script minification
-**This feature is only available if you are in [Workspace Mode](./UsageModes) and have opened a mapped widget script.**
+**This feature is only available if you are in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
 
 You can choose to have Lua scripts minified before they are published to Exosite. To do so, you can set the (optional) `minify` property
 of the Lua script's entry in `exoedit.json (see below) to `basic` or `full` (see example above). 
@@ -38,7 +38,7 @@ of the Lua script's entry in `exoedit.json (see below) to `basic` or `full` (see
 * **`full`** removes all comments, all unnecessary white space (including new line) and gives variables shorter names.
 
 ### Run widget outside of Exosite
-**This feature is only available if you are in [Workspace Mode](./UsageModes) and have opened a mapped widget script.**
+**This feature is only available if you are in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
 
 During development and for testing, Exoedit allows you to run widgets (with live or fake data) outside of Exosite.
 
