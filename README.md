@@ -46,7 +46,7 @@ Here's how it works:
 
 1. Open the command list (by pressing F1 or Ctrl+Shift+P)
 2. Select `Exoedit: Run Script`
-3. Click on the link that's beeing displayed (Ctrl+Click)
+3. Ctrl+Click on the link that's beeing displayed
 4. Your browser will display a page containing the widget. When you edit and save the widget in vscode, the browser will automatically reload.
 5. When you have finished editing the widget, it's best to stop the http server with the command `Exoedit: Stop Widget Server`.
 

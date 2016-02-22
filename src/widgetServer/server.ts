@@ -1,6 +1,6 @@
 "use strict";
 
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { createServer, IncomingMessage, ServerResponse, Server } from "http";
 import { window, ExtensionContext } from "vscode";
 import { readFile } from "fs";
 import log from "./log";
@@ -10,13 +10,7 @@ import liveReload from "./liveReload";
 
 export function runWidget(path: string, context: ExtensionContext ) {
     const handlers = getHandlers(path, context);
-    let stopped = false;
     const server = createServer((request, response) => {
-        if (stopped) {
-            response.statusCode = 200;
-            response.end("ServerStopped");
-            return;
-        }
         const handler = handlers.find(hnd => request.url === hnd.url);
         if (!handler) {
             response.statusCode = 404;
@@ -26,16 +20,15 @@ export function runWidget(path: string, context: ExtensionContext ) {
 
         handler.handle(request, response);
     });
-
+    const stopper = getStopper(server);
     server.listen("8080");
 
     log("Exoedit Widget Server started listeing on port 8080. Open the url http://localhost:8080");
 
     return {
         stop: () => {
-            if (stopped) return;
-            stopped = true;
             server.close();
+            stopper();
             log("Exoedit Widget Server stopped");
         }
     };
@@ -71,4 +64,28 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
             });
         };
     }
+}
+
+// When calling server.close(), node only prevents new connections. Therefore
+// we must keep track of the sockets in order to be able to destroy them to have
+// the server really stop immediately.
+function getStopper(server: Server) {
+    // taken from http://stackoverflow.com/questions/14626636/how-do-i-shutdown-a-node-js-https-server-immediately
+    const sockets = {};
+    let nextSocketId = 0;
+    server.on("connection", function (socket) {
+        const socketId = nextSocketId++;
+        sockets[socketId] = socket;
+
+        socket.on("close", function () {
+            delete sockets[socketId];
+        });
+    });
+
+    return () => {
+        for (let socketId in sockets) {
+            console.log("socket", socketId, "destroyed");
+            sockets[socketId].destroy();
+        }
+    };
 }

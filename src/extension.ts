@@ -40,7 +40,7 @@ function registerRunWidgetCommand(context: ExtensionContext) {
     context.subscriptions.push(commands.registerTextEditorCommand("exoedit.runWidget", () => {
         isMapped().then(result => {
             if (result) {
-                if (server) server.stop();
+                stopServer();
                 server = runWidget(window.activeTextEditor.document.fileName, context);
             }
             else {
@@ -52,11 +52,7 @@ function registerRunWidgetCommand(context: ExtensionContext) {
 
 function registerStopServerCommand(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand("exoedit.stopWidgetServer", () => {
-        if (server) {
-            const myServer = server;
-            server = null;
-            myServer.stop();
-        }
+        stopServer();
     }));
 }
 
@@ -82,5 +78,13 @@ function registerGenerateFakeDataCommand(context: ExtensionContext) {
 
 // this method is called when the extension is deactivated
 export function deactivate() {
-    if (server) server.stop();
+    if (server) stopServer();
+}
+
+function stopServer() {
+    if (server) {
+        const myServer = server;
+        server = null;
+        myServer.stop();
+    }
 }
