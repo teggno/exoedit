@@ -1,3 +1,5 @@
+"use strict";
+
 import { clone } from "../utilities";
 import { minify } from "../luaBasicMin";
 import Exosite from "../exosite";
@@ -112,7 +114,7 @@ export class Mappings implements Mapper {
         return undefined;
     }
 
-    public getWidgetPortalArg(relativePath: string, live: (dashboardId: string, widgetTitle: string) => void, fake: () => void ) {
+    public getWidgetData(relativePath: string, live: (dashboardId: string, widgetTitle: string) => void, fake: () => void ) {
         const portalWidgetMapping = this.find(this.portalWidgetScriptMappings, relativePath);
         if (portalWidgetMapping) {
             return portalWidgetMapping.fake

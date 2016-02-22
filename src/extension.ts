@@ -16,7 +16,7 @@ export function activate(context: ExtensionContext) {
     registerPublishCommand(context);
     registerRunWidgetCommand(context);
     registerStopServerCommand(context);
-    registerGetPortalsArgumentCommand(context);
+    registerGenerateFakeDataCommand(context);
 }
 
 function registerListActionsCommand(context: ExtensionContext) {
@@ -43,6 +43,9 @@ function registerRunWidgetCommand(context: ExtensionContext) {
                 if (server) server.stop();
                 server = runWidget(window.activeTextEditor.document.fileName, context);
             }
+            else {
+                window.showErrorMessage("Cannot run widget because the current file is not a widget file that has a mapping in exoedit.json.");
+            }
         });
     }));
 }
@@ -57,14 +60,18 @@ function registerStopServerCommand(context: ExtensionContext) {
     }));
 }
 
-function registerGetPortalsArgumentCommand(context: ExtensionContext) {
-    context.subscriptions.push(commands.registerCommand("exoedit.getPortalsArgument", () => {
+function registerGenerateFakeDataCommand(context: ExtensionContext) {
+    context.subscriptions.push(commands.registerCommand("exoedit.generateFakeData", () => {
         promptForPortalWidget(context)
             .then(widget => widget.getPortalArgument())
             .then(portalArg => {
                 activateNewUntitledFile().then(() => {
                     window.activeTextEditor.edit(edit => {
-                        edit.insert(new Position(0, 0), JSON.stringify(portalArg, null, 2));
+                        const fakeData = {
+                            portal: portalArg,
+                            read: {}
+                        };
+                        edit.insert(new Position(0, 0), JSON.stringify(fakeData, null, 2));
                     });
                 });
             });

@@ -1,3 +1,5 @@
+"use strict";
+
 export function minify(luaCode: string): string {
     if (!luaCode) return luaCode;
 

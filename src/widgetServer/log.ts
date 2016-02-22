@@ -1,3 +1,5 @@
+"use strict";
+
 import { OutputChannel, window } from "vscode";
 
 let channel: OutputChannel;

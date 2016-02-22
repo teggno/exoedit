@@ -1,3 +1,5 @@
+"use strict";
+
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import { window, ExtensionContext } from "vscode";
 import { readFile } from "fs";
@@ -52,7 +54,7 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
             const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;
             response.end(newScript);
         })},
-        { url: "/read", handle: read },
+        { url: "/read", handle: read(widgetPath, context) },
         { url: "/portal", handle: portal(widgetPath, context) },
         { url: "/liveReload", handle: liveReload(widgetPath) }
     ];

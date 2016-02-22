@@ -1,3 +1,5 @@
+"use strict";
+
 export interface Mapper {
     setDomainWidgetScriptMapping: (path: string, id: string) => void;
     setPortalWidgetScriptMapping: (path: string, dashboardId: string, title: string) => void;

@@ -1,3 +1,5 @@
+"use strict";
+
 import { IncomingMessage, ServerResponse } from "http";
 import { readToEnd, jsonResponse, ensurePost } from "./widgetServerUtilities";
 import { workspace } from "vscode";

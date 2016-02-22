@@ -38,10 +38,6 @@
         "title": "Exoedit"
       },
       {
-        "command": "exoedit.publish",
-        "title": "Exoedit: Publish"
-      },
-      {
         "command": "exoedit.runWidget",
         "title": "Exoedit: Run Widget"
       },
@@ -50,8 +46,12 @@
         "title": "Exoedit: Stop Widget Server"
       },
       {
-        "command": "exoedit.getPortalsArgument",
-        "title": "Exoedit: Get data for a widget's \"portal\" argument"
+        "command": "exoedit.publish",
+        "title": "Exoedit: Publish"
+      },
+      {
+        "command": "exoedit.generateFakeData",
+        "title": "Exoedit: Generate Fake Data"
       }
     ]
   },

@@ -1,3 +1,5 @@
+"use strict";
+
 const rpc = require("onep/rpc");
 
 export function getWidgetPortalArg(portalCik: string, dataSourceRids: string[], widgetLimit: WidgetDataLimit) {

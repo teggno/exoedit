@@ -1,3 +1,5 @@
+"use strict";
+
 import { IncomingMessage, ServerResponse } from "http";
 
 export function readToEnd(request: IncomingMessage): Promise<string> {

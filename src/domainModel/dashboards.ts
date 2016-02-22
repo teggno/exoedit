@@ -1,3 +1,5 @@
+"use strict";
+
 import  Exosite, * as api from "../exosite";
 import { ScriptSource, Mapper } from "./mapper";
 import { keyBy } from  "../utilities";

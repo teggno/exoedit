@@ -25,9 +25,54 @@ If you want to display fake data for a portal widget, you can add the property `
 ```json
 { "path": "SomeFolder/MyPortalWidget.js", "dashboardId": "243242", "widgetTitle": "Awsome Widget", "fake": true }
 ```
-The Widget then expects a file that is in the same folder and has the same name as the Widget's Script but the file extension `.json` instead of `.js`. This file needs to contain a JSON object that has the structure of the Widget's `portal` argument (see http://docs.exosite.com/widget/). Exoedit can help you create such a file as follows:
+The Widget then expects a file that is in the same folder and has the same name as the Widget's Script but the file extension `.json` instead of `.js`.
+
+#### Example fake data JSON file
+```json
+{
+    "portal": {
+        // ...
+    },
+    "read": {
+        "deviceAlias1": {
+            "dataPortAlias11": [
+                [123456, "data value1"],
+                [123457, "data value2"],
+                [123458, "data value3"]
+            ],
+            "dataPortAlias12": [
+                [123456, "data value4"],
+                [123457, "data value5"]
+            ]
+        },
+        "deviceAlias2": {
+            "dataPortAlias21": [
+                [123456, "data value1"],
+            ],
+            "dataPortAlias22": [
+                [123456, "data value4"],
+                [123457, "data value5"]
+            ]
+        }
+    }
+}
+```
+In the fake data JSON file, the value of the `portal` property must be an object with a structure like the object expected by the widget function's `portal` argument (see http://docs.exosite.com/widget/).
+
+
+The `read` property's value is a map of device aliases. Each device alias has a map of data port aliases as value. The value for each data port alias is an array of data points. For the sample fake data above, when your widget code calls
+```javascript
+read([ "deviceAlias1", "dataPortAlias12" ], { starttime: 123457 })
+``` 
+the function will return 
+```javascript
+[[123457, "data value5"]]
+```
+
+#### Generating a fake data JSON file
+Exoedit can help you generate a fake data JSON file as follows:
 
 1. Open the command list (by pressing F1 or Ctrl+Shift+P)
-2. Select `Exoedit: Get data for a widget's "portal" argument`
+2. Select `Exoedit: Generate Fake Data`
 3. You will have to select a portal, a dashboard and finally the widget that has the configuration that will result in the data you need.
-4. A new editor window containing the JSON will be opened.
+4. A new editor window containing the JSON will be opened. The JSON will contain the `portal` and the `read` property, but only the `portal` property will contain data wheraes the `read` property's value will be an empty object. 
