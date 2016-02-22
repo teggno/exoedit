@@ -13,7 +13,7 @@ What will be passed as the `portal` argument **depends on the type of widget**:
 ### Domain Widgets
 Domain widgets are defined on domain level in Exosite.
 
-Domain Widgets can only be run with fake data. This is because they cannot be configured with Dataports. See below how it works.
+Domain Widgets can only be run with fake data. This is because they cannot be configured with Dataports. See below how to display fake data.
 
 ### Portal Widgets
 Portal widgets are created on a dashboard.
@@ -21,7 +21,7 @@ Portal widgets are created on a dashboard.
 Portal Widgets can be run with live and fake data. If you do not configure anything, they will display live data.
 
 ### Displaying Fake Data
-If you want to display fake data for a portal widget, you can add the property `fake` with the value `true` to the widget's entry in the `exoedit.json` file. (Domain widgets do not need this configuration because they cannot display live data.)
+If you want to display fake data for a portal widget, you can add the property `fake` with the value `true` to the widget's entry in the `exoedit.json` file. (Domain widgets do not need this configuration because they can only display fake data.)
 ```json
 { "path": "SomeFolder/MyPortalWidget.js", "dashboardId": "243242", "widgetTitle": "Awsome Widget", "fake": true }
 ```
