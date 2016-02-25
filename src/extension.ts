@@ -5,6 +5,7 @@ import { getMainActions, isMapped, publishMapped } from "./mainActions";
 import { showObjectQuickPick, activateNewUntitledFile } from "./vscodeUtilities";
 import { runWidget } from "./widgetServer/server";
 import { promptForPortalWidget } from "./prompts";
+import { getLuaLog } from "./luaLog";
 
 // this method is called when the extension is activated
 // your extension is activated the very first time the command is executed
@@ -17,6 +18,7 @@ export function activate(context: ExtensionContext) {
     registerRunWidgetCommand(context);
     registerStopServerCommand(context);
     registerGenerateFakeDataCommand(context);
+    registerShowLuaScriptLogCommand(context);
 }
 
 function registerListActionsCommand(context: ExtensionContext) {
@@ -74,7 +76,9 @@ function registerGenerateFakeDataCommand(context: ExtensionContext) {
     }));
 }
 
-
+function registerShowLuaScriptLogCommand(context: ExtensionContext) {
+    context.subscriptions.push(commands.registerCommand("exoedit.showLuaScriptLog", () => getLuaLog(context)));
+}
 
 // this method is called when the extension is deactivated
 export function deactivate() {

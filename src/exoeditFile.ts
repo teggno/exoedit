@@ -7,7 +7,7 @@ import { MappingDto, Mappings } from "./domainModel/mappings";
 /**
  * @param directory full path of the directory containing the exoedit.json file.
  */
-export function getExoeditFile(directory: string): Thenable<ExoeditFile> {
+export function getExoeditFile(directory: string): Promise<ExoeditFile> {
     const filePath = path.join(directory, "exoedit.json");
     return getExoeditFileDto(filePath).then(exoeditFileDto => new ExoeditFileImpl(filePath, exoeditFileDto));
 }

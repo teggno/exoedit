@@ -28,9 +28,10 @@ export class Mappings implements Mapper {
         }
     }
 
-    setLuaDeviceScriptMapping(path: string, rid: string) {
+    setLuaDeviceScriptMapping(path: string, portalId: string, rid: string) {
         let item: LuaDeviceScriptMapping = this.find(this.deviceLuaScriptMappings, path);
         if (item) {
+            item.portalId = portalId;
             item.rid = rid;
         }
         else {
@@ -131,6 +132,11 @@ export class Mappings implements Mapper {
     public isMapped(relativePath: string) {
         return !!this.getPublisher(relativePath);
     }
+
+    public getLuaScriptInfo(relativePath: string) {
+        const luaMapping = this.find(this.deviceLuaScriptMappings, relativePath);
+        return luaMapping && luaMapping.portalId ? { portalId: luaMapping.portalId, rid: luaMapping.rid } : undefined;
+    }
 }
 
 export interface MappingDto {
@@ -150,6 +156,7 @@ interface HasPath {
 interface LuaDeviceScriptMapping {
     path: string;
     rid: string;
+    portalId?: string; // This is only saved to be able to display the lua script's debug log
     minify?: string;
 }
 

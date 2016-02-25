@@ -2,18 +2,19 @@
 A Visual Studio Code extension that helps you edit and manage scripts for Exosite.
 
 ## Feature Overview
-* Edit widget scripts
+* Import widget scripts from Exosite
 * Publish widget scripts to Exosite
-* Edit Lua scripts
+* Import Device Lua scripts from Exosite
 * Publish Lua scripts to Exosite
 * Minify Lua scripts prior to publishing
+* Show the debug log of a Lua script
 * Run widgets outside of Exosite (speeds up your widget development)
 
 ## Manual
-### Get a widget JavaScript or a Lua script for editing
+### Import a widget JavaScript or a Lua script for editing
 1. Open the command list (by pressing F1 or Ctrl+Shift+P)
 2. Select `Exoedit`
-3. Select one of the three edit actions. This will prompt you for the source of the script, download it and display it in the editor.
+3. Select one of the three import actions. This will prompt you for the source of the script, download it and display it in the editor.
 
 ### Upload the current file to Exosite
 When you have an open file, you can use Exoedit to upload it to Exosite. **Depending on whether you have previously saved the mapping of the current file to the corresponding artifact on Exosite**, there are two ways for uploading:
@@ -30,15 +31,21 @@ When you have an open file, you can use Exoedit to upload it to Exosite. **Depen
 4. The status bar will indicate when the script has been published.
 
 ### Lua script minification
-**This feature is only available if you are in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
+**This feature is only available in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
 
-You can choose to have Lua scripts minified before they are published to Exosite. To do so, you can set the (optional) `minify` property
-of the Lua script's entry in `exoedit.json` (see below) to `basic` or `full`. 
+You can choose to have Lua scripts minified before they are published to Exosite. To do so, you can set the (optional) `minify` property of the Lua script's entry in `exoedit.json` (see below) to `basic` or `full`. 
 * **`basic`** removes comments and white space at the beginning of lines. Does not remove any lines.
 * **`full`** removes all comments, all unnecessary white space (including new line) and gives variables shorter names.
 
+### Show the debug log of a Lua script 
+**This feature is only available in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
+
+You can display the current day's debug log of the currently opened lua script as follows:
+1. Open the command list (by pressing F1 or Ctrl+Shift+P)
+2. Select `Exoedit: Show Lua Script Log`
+
 ### Run widget outside of Exosite
-**This feature is only available if you are in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
+**This feature is only available in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
 
 With the help of Exoedit, you can run widgets (with live or fake data) outside of Exosite. This is convenient while developing and testing widgets.
 
@@ -62,9 +69,9 @@ Exoedit stores the mappings of your script files to the corresponding Exosite ar
     "mappings":{
         "lua":{
             "device": [
-                { "path": "abc/one.lua", "rid": "abcd1234", "minify": "basic" },
-                { "path": "abc/foo.lua", "rid": "foo123", "minify": "full" },
-                { "path": "xy/def.lua", "rid": "ghij5678" }
+                { "path": "abc/one.lua", "rid": "abcd1234", "portalId": "123456", "minify": "basic" },
+                { "path": "abc/foo.lua", "rid": "foo123", "portalId": "123456", "minify": "full" },
+                { "path": "xy/def.lua", "rid": "ghij5678", "portalId": "123456" }
             ]
         },
         "widget": {

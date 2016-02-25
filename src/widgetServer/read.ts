@@ -6,9 +6,9 @@ import settingsFactory from "../settings";
 import { getExoeditFile } from "../exoeditFile";
 import { workspace, ExtensionContext } from "vscode";
 import getFakeData from "./fakeData";
-import log from "./log";
+import log from "../log";
 import Exosite from "../exosite";
-const rpc = require("onep/rpc");
+import rpcCallPromise from "../exositeRpc";
 
 export default function factory(widgetPath: string, context: ExtensionContext) {
     const cache = {
@@ -30,7 +30,7 @@ export default function factory(widgetPath: string, context: ExtensionContext) {
                 return;
             }
 
-            log("Faking the data for the read() function");
+            log("Widget called read() function with arguments: targetResource = " + JSON.stringify(readArgs.targetResource) + ", options = " + JSON.stringify(readArgs.options));
             getExoeditFile(workspace.rootPath).then(file => {
                 file.mappings.getWidgetData(
                     workspace.asRelativePath(widgetPath),
@@ -131,23 +131,6 @@ function getTimeSeriesData(portalCik: string, deviceRid: string, dataSourceAlias
             options
         ]
     );
-}
-
-function rpcCallPromise<T>(auth: {}, procedure: string, args: any[]) {
-    log(`rpc procedure ${procedure}, args: ${JSON.stringify(args)}`);
-    return new Promise<T>((resolve, reject ) => {
-        rpc.call(auth, procedure, args,
-            function (err, response) {
-                if (err) {
-                    return reject(err);
-                }
-                if (response[0].status !== "ok") {
-                    return reject(`Error response status (${response[0].status}) in rpc procedure ${procedure}` );
-                }
-                resolve(response[0].result);
-            }
-        );
-    });
 }
 
 interface Cache {

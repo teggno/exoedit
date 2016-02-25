@@ -29,6 +29,10 @@ export class Domain {
             }
         });
     }
+
+    getPortalCik(portalId: string) {
+        return this.exosite.getPortal(portalId).then(portal => portal.info.key);
+    }
 }
 
 function getPortalWidgetConfig(widget: DashboardWidget, dashboard: ExositeDashboard) {
@@ -75,18 +79,18 @@ export class Portal {
 
     getDevices(): Thenable<Device[]> {
         return this.exosite.getDevices(this.portalId)
-        .then(devices => devices.map(device => new Device(this.domain, device.info.description.name, device.rid, this.exosite)));
+        .then(devices => devices.map(device => new Device(this.domain, this.portalId, device.info.description.name, device.rid, this.exosite)));
     }
 }
 
 export class Device {
-    constructor(private domain: string, public name: string, private rid: string, private exosite: Exosite) {}
+    constructor(private domain: string, private portalId: string, public name: string, private rid: string, private exosite: Exosite) {}
 
     getLuaScripts() {
         return this.exosite.getDeviceLuaScripts(this.rid)
         .then(scripts =>
             scripts.map(script =>
-                new LuaScript(this.domain, script.info.description.name, script.rid, script.info.description.rule.script, this.exosite)));
+                new LuaScript(this.domain, script.info.description.name, script.rid, this.portalId, script.info.description.rule.script, this.exosite)));
     }
 }
 
@@ -128,7 +132,7 @@ export class DomainWidgetScript implements ScriptSource {
 }
 
 export class LuaScript implements ScriptSource {
-    constructor(private originDomain: string, private name: string, private rid: string, private script: string, private exosite: Exosite) {
+    constructor(private originDomain: string, private name: string, private rid: string, private portalId: string, private script: string, private exosite: Exosite) {
     }
 
     public getTitle() {
@@ -144,7 +148,7 @@ export class LuaScript implements ScriptSource {
     }
 
     public setMapping(path: string, mappings: Mapper) {
-        mappings.setLuaDeviceScriptMapping(path, this.rid);
+        mappings.setLuaDeviceScriptMapping(path, this.portalId, this.rid);
     }
 
     public upload(newScript: string) {

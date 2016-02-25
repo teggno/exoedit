@@ -3,7 +3,7 @@
 export interface Mapper {
     setDomainWidgetScriptMapping: (path: string, id: string) => void;
     setPortalWidgetScriptMapping: (path: string, dashboardId: string, title: string) => void;
-    setLuaDeviceScriptMapping: (path: string, rid: string) => void;
+    setLuaDeviceScriptMapping: (path: string, rid: string, portalId: string) => void;
 }
 
 export interface ScriptSource {

@@ -6,8 +6,8 @@ let channel: OutputChannel;
 
 export default function log(text: string) {
     if (!channel) {
-        channel = window.createOutputChannel("Exoedit Widget Server");
-        channel.show();
+        channel = window.createOutputChannel("Exoedit");
     }
+    channel.show();
     channel.appendLine(text);
 }

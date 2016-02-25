@@ -2,7 +2,7 @@
   "name": "exoedit",
   "displayName": "Exoedit",
   "description": "Helps you edit and manage Exosite widget and lua scripts.",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "publisher": "teggno",
   "author": {
     "name": "Christian Bär",
@@ -52,6 +52,10 @@
       {
         "command": "exoedit.generateFakeData",
         "title": "Exoedit: Generate Fake Data"
+      },
+      {
+        "command": "exoedit.showLuaScriptLog",
+        "title": "Exoedit: Show Lua Script Log"
       }
     ]
   },

@@ -3,7 +3,7 @@
 import { createServer, IncomingMessage, ServerResponse, Server } from "http";
 import { window, ExtensionContext } from "vscode";
 import { readFile } from "fs";
-import log from "./log";
+import log from "../log";
 import read from "./read";
 import portal from "./portal";
 import liveReload from "./liveReload";

@@ -8,15 +8,16 @@ import { getExoeditFile } from "./exoeditFile";
 import Exosite from "./exosite";
 import { ScriptSource } from "./domainModel/mapper";
 import { Mappings } from "./domainModel/mappings";
+import log from "./log";
 
 export function getMainActions() {
     const actionPromises = [
-        { title: "Edit Domain Widget Script", fn: downloadDomainWidgetScript },
-        { title: "Edit Portal Widget Script", fn: downloadPortalWidgetScript },
-        { title: "Edit Device Lua Script", fn: downloadDeviceLuaScript },
-        hasActiveTextEditorWithContent() ? { title: "Upload Domain Widget Script", fn: uploadDomainWidgetScript } : undefined,
-        hasActiveTextEditorWithContent() ? { title: "Upload Portal Widget Script", fn: uploadPortalWidgetScript } : undefined,
-        hasActiveTextEditorWithContent() ? { title: "Upload Device Lua Script", fn: uploadDeviceLuaScript } : undefined,
+        { title: "Import Domain Widget Script", fn: downloadDomainWidgetScript },
+        { title: "Import Portal Widget Script", fn: downloadPortalWidgetScript },
+        { title: "Import Device Lua Script", fn: downloadDeviceLuaScript },
+        hasActiveTextEditorWithContent() ? { title: "Publish to Domain Widget", fn: publishToDomainWidget } : undefined,
+        hasActiveTextEditorWithContent() ? { title: "Publish to Portal Widget", fn: publishToPortalWidget } : undefined,
+        hasActiveTextEditorWithContent() ? { title: "Publish as Device Lua Script", fn: publishAsDeviceLuaScript } : undefined,
         hasWorkspace() ? { title: "Clear User Information", fn: (context) => { settingsFactory(context).clearCredentials(); } } : undefined
     ];
 
@@ -35,11 +36,11 @@ function downloadDomainWidgetScript(context: vscode.ExtensionContext) {
     downloadScript(() => promptForDomainWidget(context), context);
 }
 
-function uploadDomainWidgetScript(context: vscode.ExtensionContext) {
+function publishToDomainWidget(context: vscode.ExtensionContext) {
     uploadScript(() => promptForDomainWidget(context));
 }
 
-function uploadPortalWidgetScript(context: vscode.ExtensionContext) {
+function publishToPortalWidget(context: vscode.ExtensionContext) {
     uploadScript(() => promptForPortalWidget(context));
 }
 
@@ -47,7 +48,7 @@ function downloadDeviceLuaScript(context: vscode.ExtensionContext) {
     downloadScript(() => promptForDeviceLuaScript(context), context);
 }
 
-function uploadDeviceLuaScript(context: vscode.ExtensionContext) {
+function publishAsDeviceLuaScript(context: vscode.ExtensionContext) {
     uploadScript(() => promptForDeviceLuaScript(context));
 }
 
@@ -64,7 +65,7 @@ export function publishMapped(context: vscode.ExtensionContext) {
                 })
             )
         )
-        .then(showUploadCompleted);
+        .then(() => showPublishCompleted(relativePath));
 }
 
 export function isMapped() {
@@ -106,7 +107,8 @@ function uploadScript(prompt: () => Thenable<ScriptSource>) {
                 resolve(scriptSource);
             }));
         })
-        .then(scriptSource => scriptSource.upload(vscode.window.activeTextEditor.document.getText()).then(showUploadCompleted))
+        .then(scriptSource => scriptSource.upload(vscode.window.activeTextEditor.document.getText()))
+        .then(() => showPublishCompleted())
         .then(null, error => console.error(error));
 }
 
@@ -172,6 +174,6 @@ function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
     });
 }
 
-function showUploadCompleted() {
-    vscode.window.setStatusBarMessage("Upload completed", 3000);
+function showPublishCompleted(path?: string) {
+    log(`Publish ${(path ? path + " " : "")}completed (${new Date().toLocaleString() })`);
 }

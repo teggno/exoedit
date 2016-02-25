@@ -6,7 +6,7 @@ import { getExoeditFile } from "../exoeditFile";
 import { workspace, ExtensionContext } from "vscode";
 import Exosite from  "../exosite";
 import * as api from  "../exosite";
-import log from "./log";
+import log from "../log";
 import { getDomain } from "../prompts";
 import { PortalWidgetScript } from "../domainModel/dashboards";
 import getFakeData from "./fakeData";
