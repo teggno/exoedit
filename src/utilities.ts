@@ -1,5 +1,7 @@
 "use strict";
 
+import { readFile } from "fs";
+
 export function clone<T>(source: T): T {
     return JSON.parse(JSON.stringify(source));
 }
@@ -18,13 +20,11 @@ export function concatWithSlash(part1: string, part2: string) {
     return part1 + "/" + part2;
 }
 
-/**
- * Returns a map with the original array elements as values and the value returned by iteratee
- * as keys (see lodash's keyBy doc).
- */
-export function keyBy<T extends {}>(array: Array<T>, iteratee: (item: T) => string) {
-    return < { [key: string]: T}>array.reduce((prev, current) => {
-        prev[iteratee(current)] = current;
-        return prev;
-    }, {});
+export function readFilePromise(filename: string) {
+    return new Promise<Buffer>((resolve, reject) => {
+        readFile(filename, (err, data) => {
+            if (err) return reject(err);
+            resolve(data);
+        });
+    });
 }

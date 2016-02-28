@@ -5,10 +5,12 @@ import { showTextInEditor, hasWorkspace, saveAs, isDocumentEmpty } from "./vscod
 import { promptForPortalWidget, promptForDomainWidget, promptForDeviceLuaScript, getAccount } from "./prompts";
 import settingsFactory from "./settings";
 import { getExoeditFile } from "./exoeditFile";
+import { getExopublish } from "./exoeditFile2";
 import Exosite from "./exosite";
 import { ScriptSource } from "./domainModel/mapper";
 import { Mappings } from "./domainModel/mappings";
 import log from "./log";
+import { Exopublish } from "exopublish";
 
 export function getMainActions() {
     const actionPromises = [
@@ -53,28 +55,27 @@ function publishAsDeviceLuaScript(context: vscode.ExtensionContext) {
 }
 
 export function publishMapped(context: vscode.ExtensionContext) {
-    const path = vscode.window.activeTextEditor.document.fileName;
-    const relativePath = vscode.workspace.asRelativePath(path);
-    const workspaceRootPath = vscode.workspace.rootPath;
-    return getExoeditFile(workspaceRootPath).then(file => file.mappings.getPublisher(relativePath))
-        .then(uploader =>
-            getExoeditFile(workspaceRootPath).then(file =>
-                getAccount(context).then(account => {
-                    const exosite = new Exosite(file.domain, account.userName, account.password);
-                    return uploader(exosite, vscode.window.activeTextEditor.document.getText());
-                })
-            )
-        )
+    const relativePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
+    return Promise.all<Acount|Exopublish>([getAccount(context), getExopublish()])
+        .then(([account, exopublish]: [Acount, Exopublish]) => {
+            console.log(exopublish.getPortalWidgets());
+            exopublish.publishOne(relativePath, vscode.window.activeTextEditor.document.getText(), account.userName, account.password);
+        })
         .then(() => showPublishCompleted(relativePath));
 }
 
 export function isMapped() {
     if (!hasWorkspace()) return Promise.resolve(false);
 
-    const path = vscode.window.activeTextEditor.document.fileName;
-    const relativePath = vscode.workspace.asRelativePath(path);
-    const workspaceRootPath = vscode.workspace.rootPath;
-    return getExoeditFile(workspaceRootPath).then(file => file.mappings.isMapped(relativePath));
+    const relativePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
+    return getExopublish().then(exopublish => {
+        const allPaths = [
+            ...exopublish.getDeviceLuaScripts(),
+            ...exopublish.getDomainWidgets(),
+            ...exopublish.getPortalWidgets()
+        ];
+        return allPaths.indexOf(relativePath) !== -1;
+    });
 }
 
 function downloadScript(prompt: () => Thenable<ScriptSource>, context: vscode.ExtensionContext) {
@@ -176,4 +177,9 @@ function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
 
 function showPublishCompleted(path?: string) {
     log(`Publish ${(path ? path + " " : "")}completed (${new Date().toLocaleString() })`);
+}
+
+interface Acount {
+    userName: string;
+    password: string;
 }

@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "es6-promise": "^3.1.2",
+    "exopublish": "^0.1.0",
     "luamin": "^1.0.0",
     "onep": "^0.4.1",
     "request": "^2.69.0",
