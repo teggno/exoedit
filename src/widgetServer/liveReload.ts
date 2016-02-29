@@ -1,25 +1,31 @@
 "use strict";
 
 import { IncomingMessage, ServerResponse } from "http";
-import { readToEnd, jsonResponse, ensurePost } from "./widgetServerUtilities";
-import { workspace } from "vscode";
+import { access } from "fs";
+import { join } from "path";
+import { getChangeWatcherForMultipleLocations } from "../vscodeUtilities";
 
 // provides an endpoint for automatic reload of index.html when the widget has been changed
-export default function factory(widgetPath: string) {
-    const watcher = workspace.createFileSystemWatcher(widgetPath, true, false, true);
-
+export default function factory(widgetPath: string, customFilesPath: string) {
     return (request: IncomingMessage, response: ServerResponse) => {
-        const timeout = setTimeout(() => {
-            disposable.dispose();
-            response.statusCode = 204;
-            response.end();
-        }, 10000);
+        const locationsToWatch = [ widgetPath ];
+        access(customFilesPath, function(err) {
+            if (!err) locationsToWatch.push(join(customFilesPath, "*.*"));
 
-        const disposable = watcher.onDidChange(uri => {
-            disposable.dispose();
-            response.statusCode = 200;
-            response.end();
-            clearTimeout(timeout);
+            const watcher = getChangeWatcherForMultipleLocations(locationsToWatch);
+            const disposable = watcher.onDidChange(uri => {
+                disposable.dispose();
+                watcher.dispose();
+                response.statusCode = 200;
+                response.end();
+                clearTimeout(timeout);
+            });
+            const timeout = setTimeout(() => {
+                disposable.dispose();
+                watcher.dispose();
+                response.statusCode = 204;
+                response.end();
+            }, 10000);
         });
     };
 }

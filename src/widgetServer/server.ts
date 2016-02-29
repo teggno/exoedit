@@ -1,24 +1,30 @@
 "use strict";
 
 import { createServer, IncomingMessage, ServerResponse, Server } from "http";
-import { window, ExtensionContext } from "vscode";
-import { readFile } from "fs";
+import { window, ExtensionContext, workspace } from "vscode";
+import { readFile, access } from "fs";
+import { join } from "path";
 import log from "../log";
 import read from "./read";
 import portal from "./portal";
 import liveReload from "./liveReload";
+const mime = require("mime");
+
+const customFilesFolderName = "exoeditCustomFiles";
 
 export function runWidget(path: string, context: ExtensionContext ) {
     const handlers = getHandlers(path, context);
     const server = createServer((request, response) => {
         const handler = handlers.find(hnd => request.url === hnd.url);
-        if (!handler) {
-            response.statusCode = 404;
-            response.end("Not found");
-            return;
+        let handle: (request: IncomingMessage, response: ServerResponse) => void;
+        if (handler) {
+            handle = handler.handle;
+        }
+        else {
+            handle = handleUnknownRequest();
         }
 
-        handler.handle(request, response);
+        handle(request, response);
     });
     const stopper = getStopper(server);
     server.listen("8080");
@@ -36,7 +42,7 @@ export function runWidget(path: string, context: ExtensionContext ) {
 
 function getHandlers(widgetPath: string, context: ExtensionContext) {
     return [
-        { url: "/", handle: serveStaticFile("widgetClient/index.html", "text/html") },
+        { url: "/", handle: serveStaticFileRelative("widgetClient/index.html", "text/html") },
         { url: "/require.js", handle: serveScript("node_modules/requirejs/require.js") },
         { url: "/fetch.js", handle: serveScript("node_modules/whatwg-fetch/fetch.js") },
         { url: "/promise.js", handle: serveScript("node_modules/es6-promise/dist/es6-promise.min.js") },
@@ -49,20 +55,15 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
         })},
         { url: "/read", handle: read(widgetPath, context) },
         { url: "/portal", handle: portal(widgetPath, context) },
-        { url: "/liveReload", handle: liveReload(widgetPath) }
+        { url: "/liveReload", handle: liveReload(widgetPath, getCustomFilesFolderPath()) }
     ];
 
     function serveScript(workspaceRelativePath: string) {
-        return serveStaticFile(workspaceRelativePath, "text/javascript");
+        return serveStaticFileRelative(workspaceRelativePath, "text/javascript");
     }
 
-    function serveStaticFile(workspaceRelativePath: string, contentType: string) {
-        return (request: IncomingMessage, response: ServerResponse) => {
-            readFile(context.asAbsolutePath(workspaceRelativePath), (err, file) => {
-                response.setHeader("content-type", contentType);
-                response.end(file);
-            });
-        };
+    function serveStaticFileRelative(workspaceRelativePath: string, contentType: string) {
+        return serveStaticFile(context.asAbsolutePath(workspaceRelativePath), contentType);
     }
 }
 
@@ -88,4 +89,34 @@ function getStopper(server: Server) {
             sockets[socketId].destroy();
         }
     };
+}
+
+
+function serveStaticFile(absolutePath: string, contentType: string) {
+    return (request: IncomingMessage, response: ServerResponse) => {
+        readFile(absolutePath, (err, file) => {
+            response.setHeader("content-type", contentType);
+            response.end(file);
+        });
+    };
+}
+
+function handleUnknownRequest() {
+    return (request: IncomingMessage, response: ServerResponse) => {
+        const filePath = join(getCustomFilesFolderPath(), request.url);
+        if (access(filePath, err => {
+            if (err) {
+                response.statusCode = 404;
+                response.end("Not found");
+                return;
+            }
+
+            const contentType = mime.lookup(filePath);
+            return serveStaticFile(filePath, contentType)(request, response);
+        }));
+    };
+}
+
+function getCustomFilesFolderPath() {
+    return join(workspace.rootPath, customFilesFolderName);
 }

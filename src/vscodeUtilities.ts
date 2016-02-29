@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, workspace, commands, QuickPickOptions, TextDocument, Position } from "vscode";
+import { window, workspace, commands, QuickPickOptions, TextDocument, Position, Uri } from "vscode";
 
 export function showObjectQuickPick<T>(items: T[] | Thenable<T[]>, titleFn: (item: T) => string, options?: QuickPickOptions) {
     return Promise.resolve(items)
@@ -76,4 +76,21 @@ export function showTextInEditor(text: string): Thenable<void> {
     return prepareEditor.then(() => {
         return window.activeTextEditor.edit(x => x.insert(new Position(0, 0), text));
     });
+}
+
+export function getChangeWatcherForMultipleLocations(locations: string[]) {
+    const watchers = locations.map(location => workspace.createFileSystemWatcher(location, true, false, true));
+    return {
+        dispose: () => {
+            watchers.forEach(watcher => watcher.dispose());
+        },
+        onDidChange: (listener: (uri: Uri) => void) => {
+            const disposables = watchers.map(watcher => watcher.onDidChange(listener));
+            return {
+                dispose: () => {
+                    disposables.forEach(disposable => disposable.dispose());
+                }
+            };
+        }
+    };
 }
