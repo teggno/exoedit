@@ -40,7 +40,7 @@ export function runWidget(path: string, context: ExtensionContext ) {
     };
 }
 
-function getHandlers(widgetPath: string, context: ExtensionContext) {
+function getHandlers(absoluteWidgetPath: string, context: ExtensionContext) {
     return [
         { url: "/", handle: serveStaticFileRelative("widgetClient/index.html", "text/html") },
         { url: "/jquery.js", handle: serveScript("vendor/jquery-1.5.1.js") },
@@ -49,14 +49,14 @@ function getHandlers(widgetPath: string, context: ExtensionContext) {
         { url: "/promise.js", handle: serveScript("node_modules/es6-promise/dist/es6-promise.min.js") },
         { url: "/exositeFake.js", handle: serveScript("widgetClient/out/exositeFake.js") },
         { url: "/liveReload.js", handle: serveScript("widgetClient/out/liveReload.js") },
-        { url: "/widget.js", handle: (request: IncomingMessage, response: ServerResponse) => readFile(widgetPath, (err, widgetScript) => {
+        { url: "/widget.js", handle: (request: IncomingMessage, response: ServerResponse) => readFile(absoluteWidgetPath, (err, widgetScript) => {
             response.setHeader("content-type", "text/javascript");
             const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;
             response.end(newScript);
         })},
-        { url: "/read", handle: read(widgetPath, context) },
-        { url: "/portal", handle: portal(widgetPath, context) },
-        { url: "/liveReload", handle: liveReload(widgetPath, getCustomFilesFolderPath()) }
+        { url: "/read", handle: read(absoluteWidgetPath, context) },
+        { url: "/portal", handle: portal(absoluteWidgetPath, context) },
+        { url: "/liveReload", handle: liveReload(absoluteWidgetPath, getCustomFilesFolderPath()) }
     ];
 
     function serveScript(workspaceRelativePath: string) {

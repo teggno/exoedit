@@ -2,7 +2,6 @@
 
 import  Exosite, * as api from "../exosite";
 import { ScriptSource, Mapper } from "./mapper";
-import { keyBy } from  "../utilities";
 import { getWidgetPortalArg, WidgetDataLimit } from "../widgetPortalArg";
 
 export interface Dashboard {

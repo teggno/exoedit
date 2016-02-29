@@ -1,6 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
+import { Exopublish } from "exopublish";
+import { arePathsEqual } from "./utilities";
 import { showTextInEditor, hasWorkspace, saveAs, isDocumentEmpty } from "./vscodeUtilities";
 import { promptForPortalWidget, promptForDomainWidget, promptForDeviceLuaScript, getAccount } from "./prompts";
 import settingsFactory from "./settings";
@@ -10,7 +12,6 @@ import Exosite from "./exosite";
 import { ScriptSource } from "./domainModel/mapper";
 import { Mappings } from "./domainModel/mappings";
 import log from "./log";
-import { Exopublish } from "exopublish";
 
 export function getMainActions() {
     const actionPromises = [
@@ -58,8 +59,8 @@ export function publishMapped(context: vscode.ExtensionContext) {
     const relativePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
     return Promise.all<Acount|Exopublish>([getAccount(context), getExopublish()])
         .then(([account, exopublish]: [Acount, Exopublish]) => {
-            console.log(exopublish.getPortalWidgets());
-            exopublish.publishOne(relativePath, vscode.window.activeTextEditor.document.getText(), account.userName, account.password);
+            const pathAsOfExopublish = getAllPaths(exopublish).find(exopublishPath => arePathsEqual(exopublishPath, relativePath));
+            exopublish.publishOne(pathAsOfExopublish, vscode.window.activeTextEditor.document.getText(), account.userName, account.password);
         })
         .then(() => showPublishCompleted(relativePath));
 }
@@ -69,13 +70,17 @@ export function isMapped() {
 
     const relativePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
     return getExopublish().then(exopublish => {
-        const allPaths = [
-            ...exopublish.getDeviceLuaScripts(),
-            ...exopublish.getDomainWidgets(),
-            ...exopublish.getPortalWidgets()
-        ];
-        return allPaths.indexOf(relativePath) !== -1;
+        const allPaths = getAllPaths(exopublish);
+        return !!allPaths.find(path => arePathsEqual(path, relativePath));
     });
+}
+
+function getAllPaths(exopublish: Exopublish) {
+    return [
+        ...exopublish.getDeviceLuaScripts(),
+        ...exopublish.getDomainWidgets(),
+        ...exopublish.getPortalWidgets()
+    ];
 }
 
 function downloadScript(prompt: () => Thenable<ScriptSource>, context: vscode.ExtensionContext) {

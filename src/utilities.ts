@@ -1,6 +1,7 @@
 "use strict";
 
 import { readFile } from "fs";
+import { sep } from "path";
 
 export function clone<T>(source: T): T {
     return JSON.parse(JSON.stringify(source));
@@ -27,4 +28,15 @@ export function readFilePromise(filename: string) {
             resolve(data);
         });
     });
+}
+
+export function arePathsEqual(path1: string, path2: string) {
+    if (path1 === path2) return true;
+
+    path1 = path1 || "";
+    path2 = path2 || "";
+    path1 = path1.indexOf(sep) === 0 && path1.length > sep.length ? path1.substr(sep.length) : path1;
+    path2 = path2.indexOf(sep) === 0 && path2.length > sep.length ? path2.substr(sep.length) : path2;
+
+    return path1 === path2;
 }

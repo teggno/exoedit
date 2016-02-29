@@ -1,6 +1,6 @@
 "use strict";
 
-import { clone } from "../utilities";
+import { clone, arePathsEqual } from "../utilities";
 import { minify } from "../luaBasicMin";
 import Exosite from "../exosite";
 import { Mapper } from "./mapper";
@@ -70,7 +70,7 @@ export class Mappings implements Mapper {
     }
 
     private find<T extends HasPath>(haystack: T[], path: string): T {
-        return haystack.find(item => path.toLowerCase() === item.path.toLowerCase());
+        return haystack.find(item => arePathsEqual(path.toLowerCase(), item.path.toLowerCase()));
     }
 
     public Serialize() {
