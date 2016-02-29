@@ -16,13 +16,13 @@ export interface ExoeditFile {
     mappings: Mappings;
     domain: string;
     save: () => Thenable<void>;
-    widgetRunScripts: string[];
+    customFilesDirectory: string;
 }
 
 class ExoeditFileImpl implements ExoeditFile {
     private _mappings: Mappings;
     private _domain: string;
-    private _widgetRunScripts: string[];
+    private _customFilesDirectory: string;
 
     constructor(private filePath: string, exoeditFileDto?: ExoeditFileDto) {
         if (!exoeditFileDto) exoeditFileDto = {};
@@ -32,7 +32,7 @@ class ExoeditFileImpl implements ExoeditFile {
             : new Mappings();
 
         this._domain = exoeditFileDto.domain;
-        this._widgetRunScripts = exoeditFileDto.widgetRunScripts || [];
+        this._customFilesDirectory = exoeditFileDto.customFilesDirectory || "exoeditCustomFiles";
     }
 
     get mappings() {
@@ -47,8 +47,8 @@ class ExoeditFileImpl implements ExoeditFile {
         return this._domain;
     }
 
-    get widgetRunScripts() {
-        return this._widgetRunScripts;
+    get customFilesDirectory() {
+        return this._customFilesDirectory;
     }
 
     save() {
@@ -114,6 +114,6 @@ function getExoeditFileDto(filePath: string) {
 interface ExoeditFileDto {
     domain?: string;
     mapping?: MappingDto;
-    widgetRunScripts?: string[];
+    customFilesDirectory?: string;
 }
 

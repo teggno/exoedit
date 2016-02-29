@@ -84,7 +84,8 @@ Exoedit stores the mappings of your script files to the corresponding Exosite ar
                 { "path": "foo/bazscript.js", "dashboardId": "243242", "widgetTitle": "Another title", "fake": true }
             ]
         }
-    }
+    },
+    "customFilesDirectory": "DirectoryForAdditionalFilesWhenRunningWidgets"
 }
 ```
 

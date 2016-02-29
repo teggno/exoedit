@@ -4,13 +4,14 @@ import { createServer, IncomingMessage, ServerResponse, Server } from "http";
 import { window, ExtensionContext, workspace } from "vscode";
 import { readFile, access } from "fs";
 import { join } from "path";
+import { parse } from "url";
 import log from "../log";
 import read from "./read";
 import portal from "./portal";
 import liveReload from "./liveReload";
-const mime = require("mime");
+import { getExoeditFile } from "../exoeditFile";
 
-const customFilesFolderName = "exoeditCustomFiles";
+const mime = require("mime");
 
 export function runWidget(path: string, context: ExtensionContext ) {
     const handlers = getHandlers(path, context);
@@ -56,7 +57,7 @@ function getHandlers(absoluteWidgetPath: string, context: ExtensionContext) {
         })},
         { url: "/read", handle: read(absoluteWidgetPath, context) },
         { url: "/portal", handle: portal(absoluteWidgetPath, context) },
-        { url: "/liveReload", handle: liveReload(absoluteWidgetPath, getCustomFilesFolderPath()) }
+        { url: "/liveReload", handle: liveReload(absoluteWidgetPath) }
     ];
 
     function serveScript(workspaceRelativePath: string) {
@@ -104,20 +105,18 @@ function serveStaticFile(absolutePath: string, contentType: string) {
 
 function handleUnknownRequest() {
     return (request: IncomingMessage, response: ServerResponse) => {
-        const filePath = join(getCustomFilesFolderPath(), request.url);
-        if (access(filePath, err => {
-            if (err) {
-                response.statusCode = 404;
-                response.end("Not found");
-                return;
-            }
+        getExoeditFile(workspace.rootPath).then(file => {
+            const filePath = join(workspace.rootPath, file.customFilesDirectory, parse(request.url).pathname);
+            if (access(filePath, err => {
+                if (err) {
+                    response.statusCode = 404;
+                    response.end("Not found");
+                    return;
+                }
 
-            const contentType = mime.lookup(filePath);
-            return serveStaticFile(filePath, contentType)(request, response);
-        }));
+                const contentType = mime.lookup(filePath);
+                return serveStaticFile(filePath, contentType)(request, response);
+            }));
+        });
     };
-}
-
-function getCustomFilesFolderPath() {
-    return join(workspace.rootPath, customFilesFolderName);
 }
