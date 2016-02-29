@@ -78,3 +78,4 @@ Exoedit can help you generate a fake data JSON file as follows:
 
 ### Serving additional files
 In case your widgets need to load custom files (e.g. your css or js files), you can put them in a folder called `exoeditCustomFiles` directly in the folder you have opened with Visual Studio Code.
+Note: jQuery 1.5.1 (which is the version provided by Exosite) is included by default.

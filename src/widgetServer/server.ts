@@ -43,6 +43,7 @@ export function runWidget(path: string, context: ExtensionContext ) {
 function getHandlers(widgetPath: string, context: ExtensionContext) {
     return [
         { url: "/", handle: serveStaticFileRelative("widgetClient/index.html", "text/html") },
+        { url: "/jquery.js", handle: serveScript("vendor/jquery-1.5.1.js") },
         { url: "/require.js", handle: serveScript("node_modules/requirejs/require.js") },
         { url: "/fetch.js", handle: serveScript("node_modules/whatwg-fetch/fetch.js") },
         { url: "/promise.js", handle: serveScript("node_modules/es6-promise/dist/es6-promise.min.js") },
