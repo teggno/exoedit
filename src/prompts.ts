@@ -2,8 +2,7 @@
 
 import * as vscode from "vscode";
 import { showObjectQuickPick, hasWorkspace } from "./vscodeUtilities";
-import settingsFactory from "./settings";
-import { Account } from "./settings";
+import settingsFactory, { Account } from "./settings";
 import Exosite from "./exosite";
 import { getExoeditFile } from "./exoeditFile";
 import { Domain } from "./domainModel/portals";

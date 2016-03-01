@@ -10,6 +10,7 @@ import read from "./read";
 import portal from "./portal";
 import liveReload from "./liveReload";
 import { getExoeditFile } from "../exoeditFile";
+import proxy from "./proxy";
 
 const mime = require("mime");
 
@@ -22,7 +23,7 @@ export function runWidget(path: string, context: ExtensionContext ) {
             handle = handler.handle;
         }
         else {
-            handle = handleUnknownRequest();
+            handle = handleUnknownRequest(context);
         }
 
         handle(request, response);
@@ -103,15 +104,19 @@ function serveStaticFile(absolutePath: string, contentType: string) {
     };
 }
 
-function handleUnknownRequest() {
+function handleUnknownRequest(context: ExtensionContext) {
     return (request: IncomingMessage, response: ServerResponse) => {
         getExoeditFile(workspace.rootPath).then(file => {
-            const filePath = join(workspace.rootPath, file.customFilesDirectory, parse(request.url).pathname);
+            const pathName = parse(request.url).pathname;
+            const filePath = join(workspace.rootPath, file.customFilesDirectory, pathName);
             if (access(filePath, err => {
                 if (err) {
-                    response.statusCode = 404;
-                    response.end("Not found");
-                    return;
+                    if (pathName.toLowerCase().indexOf("/api/portals/v1") === -1) {
+                        response.statusCode = 404;
+                        response.end("Not found");
+                        return;
+                    }
+                    return proxy(context).forwardToExositeApi(request, response);
                 }
 
                 const contentType = mime.lookup(filePath);
