@@ -35,7 +35,7 @@ export class Mappings implements Mapper {
             item.rid = rid;
         }
         else {
-            item = { path: path, rid: rid };
+            item = { path: path, rid: rid, portalId: portalId };
             this.deviceLuaScriptMappings.push(item);
         }
     }

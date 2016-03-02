@@ -6,6 +6,7 @@ import settingsFactory, { Account } from "./settings";
 import Exosite from "./exosite";
 import { getExoeditFile } from "./exoeditFile";
 import { Domain } from "./domainModel/portals";
+import log from "./log";
 
 export function promptForPortalWidget(context: vscode.ExtensionContext) {
     return promptForPortal(context)

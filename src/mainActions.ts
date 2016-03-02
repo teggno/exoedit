@@ -21,7 +21,9 @@ export function getMainActions() {
         hasActiveTextEditorWithContent() ? { title: "Publish to Domain Widget", fn: publishToDomainWidget } : undefined,
         hasActiveTextEditorWithContent() ? { title: "Publish to Portal Widget", fn: publishToPortalWidget } : undefined,
         hasActiveTextEditorWithContent() ? { title: "Publish as Device Lua Script", fn: publishAsDeviceLuaScript } : undefined,
-        hasWorkspace() ? { title: "Clear User Information", fn: (context) => { settingsFactory(context).clearCredentials(); } } : undefined
+        hasWorkspace() ? { title: "Clear User Information", fn: (context) => {
+            settingsFactory(context).clearCredentials().then(() => log("Cleared user information", true));
+        } } : undefined
     ];
 
     return Promise.all(actionPromises).then(actions => actions.filter(item => !!item));
@@ -92,7 +94,10 @@ function downloadScript(prompt: () => Thenable<ScriptSource>, context: vscode.Ex
         })
         .then(showTextInEditor)
         .then(() => promptForMappingIfEnabled(scriptSource, context))
-        .then(null, error => { console.error(error); });
+        .then(null, error => {
+            log(error, true);
+            console.error(error);
+        });
 }
 
 function uploadScript(prompt: () => Thenable<ScriptSource>) {
@@ -115,7 +120,10 @@ function uploadScript(prompt: () => Thenable<ScriptSource>) {
         })
         .then(scriptSource => scriptSource.upload(vscode.window.activeTextEditor.document.getText()))
         .then(() => showPublishCompleted())
-        .then(null, error => console.error(error));
+        .then(null, error => {
+            log(error, true);
+            console.error(error);
+        });
 }
 
 function promptForMappingIfEnabled(scriptSource: ScriptSource, context: vscode.ExtensionContext) {
@@ -181,7 +189,7 @@ function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
 }
 
 function showPublishCompleted(path?: string) {
-    log(`Publish ${(path ? path + " " : "")}completed (${new Date().toLocaleString() })`);
+    log(`Publish ${(path ? path + " " : "")}completed (${new Date().toLocaleString() })`, true);
 }
 
 interface Acount {

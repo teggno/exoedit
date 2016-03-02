@@ -33,13 +33,13 @@ export function getLuaLog(context: ExtensionContext) {
     .then(lines => {
         if (!lines) return;
 
-        log(`----------------------------------`);
+        log(`----------------------------------`, true);
         log(`Lua Script log of ${relativePath}:`);
         const logMessages = lines.map(item => `${new Date(item[0] * 1000).toLocaleString()}\t${item[1] }`);
         log(logMessages.join("\n"));
     })
     .catch(error => {
-        log("Error getting lua log");
+        log("Error getting lua log", true);
         log(error);
     });
 }

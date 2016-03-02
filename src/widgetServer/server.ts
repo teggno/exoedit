@@ -31,7 +31,7 @@ export function runWidget(path: string, context: ExtensionContext ) {
     const stopper = getStopper(server);
     server.listen("8080");
 
-    log("Exoedit Widget Server started listeing on port 8080. Open the url http://localhost:8080");
+    log("Exoedit Widget Server started listening on port 8080. Open the url http://localhost:8080");
 
     return {
         stop: () => {
