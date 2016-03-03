@@ -40,7 +40,7 @@ function live (response: ServerResponse, context: ExtensionContext, cache: Cache
     };
 };
 
-function fake (response: ServerResponse, widgetPath: string) {
+function fake(response: ServerResponse, widgetPath: string) {
     return () => {
         log("Getting fake data for the widget's \"portal\" parameter");
         getFakeData(widgetPath)
@@ -48,9 +48,10 @@ function fake (response: ServerResponse, widgetPath: string) {
             jsonResponse(response, fakeData.portal)
         )
         .catch(error => {
+            log("Error while loading fake data:", true);
             log(error);
             response.statusCode = 404;
-            response.end(error);
+            response.end("Error while loading fake data: " + error.toString());
         });
     };
 }

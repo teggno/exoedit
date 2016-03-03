@@ -2,6 +2,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import log from "../log";
 
 export default function getFakeData(widgetPath: string) {
     const fakeFilePath = getFakeFilePath(widgetPath);
@@ -14,14 +15,20 @@ export default function getFakeData(widgetPath: string) {
                 if (err) {
                     return reject(err.message);
                 }
-                const fakeFileContent = JSON.parse(data.toString());
-                if (!fakeFileContent.portal) {
-                    return reject(`The JSON in the fake data file "${fakeFilePath}" does not contain a "portal" field.`);
+                try {
+                    const fakeFileContent = JSON.parse(data.toString());
+                    if (!fakeFileContent.portal) {
+                        throw `The JSON in the fake data file "${fakeFilePath}" does not contain a "portal" field.`;
+                    }
+                    if (!fakeFileContent.read) {
+                        throw `The JSON in the fake data file "${fakeFilePath}" does not contain a "portal" field.`;
+                    }
+                    resolve(<FakeData>fakeFileContent);
                 }
-                if (!fakeFileContent.read) {
-                    return reject(`The JSON in the fake data file "${fakeFilePath}" does not contain a "portal" field.`);
+                catch (error) {
+                    return reject(error);
                 }
-                resolve(<FakeData>fakeFileContent);
+
             });
         });
     });
