@@ -53,7 +53,7 @@ function getHandlers(absoluteWidgetPath: string, context: ExtensionContext) {
         { url: "/liveReload.js", handle: serveScript("widgetClient/out/liveReload.js") },
         { url: "/widget.js", handle: (request: IncomingMessage, response: ServerResponse) => readFile(absoluteWidgetPath, (err, widgetScript) => {
             response.setHeader("content-type", "text/javascript");
-            const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;
+            const newScript = `define('widget', ['require', 'exports', 'exositeFake'], function(require, exports, exositeFake){var read = exositeFake.read; var write = exositeFake.write; var exoedit_widget_fn = ${widgetScript.toString()};return exoedit_widget_fn;});`;
             response.end(newScript);
         })},
         { url: "/read", handle: read(absoluteWidgetPath, context) },

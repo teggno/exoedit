@@ -68,3 +68,14 @@ export function read(targetResource: string[], options: ReadOptions) {
 
     return new PointDeferred(promise);
 }
+
+export function write(targetResource: string[], value: string|number) {
+    console.log(`write() called with targetResource: ${JSON.stringify(targetResource)}, value: ${value}` );
+    return {
+        done: function(callback) {
+            callback();
+        },
+        fail: function(callback) {
+        }
+    };
+}
