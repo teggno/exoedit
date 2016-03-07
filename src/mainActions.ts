@@ -170,11 +170,24 @@ function promptForSaveAction(scriptSource: ScriptSource) {
 }
 
 function saveAndMap(scriptSource: ScriptSource) {
-    return saveAs().then(result => {
-        if (!result) return;
-        const relativeFilePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.uri);
-        return saveMapping(relativeFilePath, scriptSource);
-    });
+    const save = () => {
+        return saveAs().then(result => {
+            if (!result) return;
+            const relativeFilePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.uri);
+            return saveMapping(relativeFilePath, scriptSource);
+        });
+    };
+
+    if (isDocumentEmpty(vscode.window.activeTextEditor.document)) {
+        // Add an empty line if the document is empty. This is because vscode will not save empty documents.
+        return vscode.window.activeTextEditor.edit(builder => {
+            builder.insert(new vscode.Position(0, 0), "\n");
+        })
+        .then(() => save());
+    }
+    else {
+        save();
+    }
 }
 
 function saveMapping(relativeFilePath: string, scriptSource: ScriptSource) {
