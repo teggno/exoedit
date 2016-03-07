@@ -14,7 +14,7 @@ import proxy from "./proxy";
 
 const mime = require("mime");
 
-export function runWidget(path: string, context: ExtensionContext ) {
+export function runWidget(path: string, context: ExtensionContext) {
     const handlers = getHandlers(path, context);
     const server = createServer((request, response) => {
         const handler = handlers.find(hnd => request.url === hnd.url);
@@ -31,7 +31,7 @@ export function runWidget(path: string, context: ExtensionContext ) {
     const stopper = getStopper(server);
     server.listen("8080");
 
-    log("Exoedit Widget Server started listening on port 8080. Open the url http://localhost:8080");
+    log("Exoedit Widget Server started listening on port 8080. Open the url http://localhost:8080", true);
 
     return {
         stop: () => {
