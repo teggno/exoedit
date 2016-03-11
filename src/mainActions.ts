@@ -12,6 +12,8 @@ import Exosite from "./exosite";
 import { ScriptSource } from "./domainModel/mapper";
 import { Mappings } from "./domainModel/mappings";
 import log from "./log";
+import * as path from "path";
+import { writeFile } from "fs";
 
 export function getMainActions() {
     const actionPromises = [
@@ -59,12 +61,34 @@ function publishAsDeviceLuaScript(context: vscode.ExtensionContext) {
 
 export function publishMapped(context: vscode.ExtensionContext) {
     const relativePath = vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
+    const scriptToPublish = vscode.window.activeTextEditor.document.getText();
     return Promise.all<Acount|Exopublish>([getAccount(context), getExopublish()])
         .then(([account, exopublish]: [Acount, Exopublish]) => {
             const pathAsOfExopublish = getAllPaths(exopublish).find(exopublishPath => arePathsEqual(exopublishPath, relativePath));
-            exopublish.publishOne(pathAsOfExopublish, vscode.window.activeTextEditor.document.getText(), account.userName, account.password);
+            return exopublish.publishOne(pathAsOfExopublish, scriptToPublish, account.userName, account.password);
         })
-        .then(() => showPublishCompleted(relativePath));
+        .then(script => {
+            const publishedScript = (typeof script === "string") ? script : script.toString();
+            if (scriptToPublish !== publishedScript) {
+                return savePublishedScript(publishedScript).then(() => showPublishCompleted());
+            }
+            else {
+                showPublishCompleted(relativePath);
+            }
+        });
+}
+
+function savePublishedScript(publishedScript: string) {
+    const pathParts = path.parse(vscode.window.activeTextEditor.document.fileName);
+    const fileName = path.join(pathParts.dir, pathParts.name + ".published" + pathParts.ext);
+    return new Promise((resolve, reject) => {
+        writeFile(fileName, publishedScript, function(err) {
+            if (err) {
+                console.log("Error saving published file");
+            }
+            resolve();
+        });
+    });
 }
 
 export function isMapped() {
