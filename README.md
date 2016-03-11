@@ -31,31 +31,33 @@ When you have an open file, you can use Exoedit to upload it to Exosite. **Depen
 4. The status bar will indicate when the script has been published.
 
 ### Lua script minification
-**This feature is only available in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
+**This feature is only available in [Workspace Mode](./UsageModes.md)**
 
 You can choose to have Lua scripts minified before they are published to Exosite. To do so, you can set the (optional) `minify` property of the Lua script's entry in `exoedit.json` (see below) to `basic` or `full`. 
 * **`basic`** removes comments and white space at the beginning of lines. Does not remove any lines.
 * **`full`** removes all comments, all unnecessary white space (including new line) and gives variables shorter names.
 
 ### Show the debug log of a Lua script 
-**This feature is only available in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
+**This feature is only available in [Workspace Mode](./UsageModes.md)**
 
-You can display the current day's debug log of the currently opened lua script as follows:
-1. Open the command list (by pressing F1 or Ctrl+Shift+P)
-2. Select `Exoedit: Show Lua Script Log`
+You can display the current day's debug log of the currently open lua script as follows:
+1. Open the lua script file in question (must be a file that is mapped to the corresponding lua script on Exosite)
+2. Open the command list (by pressing F1 or Ctrl+Shift+P)
+3. Select `Exoedit: Show Lua Script Log`
 
 ### Run widget outside of Exosite
-**This feature is only available in [Workspace Mode](./UsageModes.md) and have opened a mapped widget script.**
+**This feature is only available in [Workspace Mode](./UsageModes.md)**
 
 With the help of Exoedit, you can run widgets (with live or fake data) outside of Exosite. This is convenient while developing and testing widgets.
 
 Here's how it works:
 
-1. Open the command list (by pressing F1 or Ctrl+Shift+P)
-2. Select `Exoedit: Run Script`
-3. Ctrl+Click on the link that's beeing displayed
-4. Your browser will display a page containing the widget. When you edit and save the widget in vscode, the browser will automatically reload.
-5. When you have finished editing the widget, it's best to stop the http server with the command `Exoedit: Stop Widget Server`.
+1. Open the script file of the widget to be run
+2. Open the command list (by pressing F1 or Ctrl+Shift+P)
+3. Select `Exoedit: Run Script`
+4. Ctrl+Click on the link that's beeing displayed
+5. Your browser will display a page containing the widget. When you edit and save the widget in vscode, the browser will automatically reload.
+6. When you have finished editing the widget, it's best to stop the http server with the command `Exoedit: Stop Widget Server`.
 
 For more information on how to configure the widget to display live or fake data, see [Running Widgets](./RunningWidgets.md).
 
