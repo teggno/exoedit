@@ -15,7 +15,7 @@
         require(['widget'], function(widget) {
             fetch('portal').then(function(response){
                 response.json().then(function(portal){
-                    widget(document.getElementById('container'), portal);
+                    widget(document.getElementById('exoeditWidgetContainer'), portal);
                 });
             });
         });
@@ -23,6 +23,6 @@
 </script>
 </head>
 <body>
-    <div id="container"></div>
+    <div id="exoeditWidgetContainer" class="exoeditWidgetContainer"></div>
 </body>
 </html>
