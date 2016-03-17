@@ -17,7 +17,8 @@ const mime = require("mime");
 export function runWidget(path: string, context: ExtensionContext) {
     const handlers = getHandlers(path, context);
     const server = createServer((request, response) => {
-        const handler = handlers.find(hnd => request.url === hnd.url);
+        const handler = handlers.find(hnd => (typeof hnd.url === "string" && request.url === hnd.url) ||
+            (typeof hnd.url !== "string" && (<RegExp>hnd.url).test(request.url)));
         let handle: (request: IncomingMessage, response: ServerResponse) => void;
         if (handler) {
             handle = handler.handle;
@@ -44,7 +45,7 @@ export function runWidget(path: string, context: ExtensionContext) {
 
 function getHandlers(absoluteWidgetPath: string, context: ExtensionContext) {
     return [
-        { url: "/", handle: serveStaticFileRelative("widgetClient/index.html", "text/html") },
+        { url: new RegExp("^\/(\\?(.*)*)?$"), handle: serveStaticFileRelative("widgetClient/index.html", "text/html") },
         { url: "/jquery.js", handle: serveScript("vendor/jquery-1.5.1.js") },
         { url: "/require.js", handle: serveScript("node_modules/requirejs/require.js") },
         { url: "/fetch.js", handle: serveScript("node_modules/whatwg-fetch/fetch.js") },
