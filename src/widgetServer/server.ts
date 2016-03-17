@@ -117,6 +117,7 @@ function handleUnknownRequest(context: ExtensionContext) {
                         response.end("Not found");
                         return;
                     }
+                    log(`forwarding unknown url to Exosite ${request.url}`);
                     return proxy(context).forwardToExositeApi(request, response);
                 }
 
