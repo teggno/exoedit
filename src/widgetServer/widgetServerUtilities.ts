@@ -21,7 +21,9 @@ export function readToEnd(request: IncomingMessage): Promise<string> {
 export function jsonResponse(response: ServerResponse, data: any): void {
     response.statusCode = 200;
     response.setHeader("content-type", "application/json");
-    if (typeof data !== "string") data = JSON.stringify(data);
+    if (typeof data !== "string") {
+        data = JSON.stringify(data);
+    }
     response.end(data);
 }
 

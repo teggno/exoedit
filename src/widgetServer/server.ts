@@ -123,12 +123,12 @@ function handleUnknownRequest(absoluteWidgetPath: string, context: ExtensionCont
                         if (fakeData.api && fakeData.api[pathName]) {
                             log(`returning fake data for api request ${request.url}`);
                             jsonResponse(response, fakeData.api[pathName]);
-                            response.end(fakeData.api[pathName]);
                             return;
                         }
                         log(`forwarding unknown url to Exosite ${request.url}`);
                         return proxy(context).forwardToExositeApi(request, response);
                     });
+                    return;
                 }
 
                 const contentType = mime.lookup(filePath);
