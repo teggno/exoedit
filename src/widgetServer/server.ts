@@ -11,6 +11,8 @@ import portal from "./portal";
 import liveReload from "./liveReload";
 import { getExoeditFile } from "../exoeditFile";
 import proxy from "./proxy";
+import getFakeData from "./fakeData";
+import { jsonResponse } from "./widgetServerUtilities";
 
 const mime = require("mime");
 
@@ -24,7 +26,7 @@ export function runWidget(path: string, context: ExtensionContext) {
             handle = handler.handle;
         }
         else {
-            handle = handleUnknownRequest(context);
+            handle = handleUnknownRequest(path, context);
         }
 
         handle(request, response);
@@ -105,7 +107,7 @@ function serveStaticFile(absolutePath: string, contentType: string) {
     };
 }
 
-function handleUnknownRequest(context: ExtensionContext) {
+function handleUnknownRequest(absoluteWidgetPath: string, context: ExtensionContext) {
     return (request: IncomingMessage, response: ServerResponse) => {
         getExoeditFile(workspace.rootPath).then(file => {
             const pathName = parse(request.url).pathname;
@@ -117,8 +119,16 @@ function handleUnknownRequest(context: ExtensionContext) {
                         response.end("Not found");
                         return;
                     }
-                    log(`forwarding unknown url to Exosite ${request.url}`);
-                    return proxy(context).forwardToExositeApi(request, response);
+                    getFakeData(absoluteWidgetPath).then(function(fakeData) {
+                        if (fakeData.api && fakeData.api[pathName]) {
+                            log(`returning fake data for api request ${request.url}`);
+                            jsonResponse(response, fakeData.api[pathName]);
+                            response.end(fakeData.api[pathName]);
+                            return;
+                        }
+                        log(`forwarding unknown url to Exosite ${request.url}`);
+                        return proxy(context).forwardToExositeApi(request, response);
+                    });
                 }
 
                 const contentType = mime.lookup(filePath);

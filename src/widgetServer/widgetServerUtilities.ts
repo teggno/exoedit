@@ -16,12 +16,13 @@ export function readToEnd(request: IncomingMessage): Promise<string> {
 }
 
 /**
- * Adds the necessary headers, JSON.stringifies the data and adds it to the response.
+ * Adds the necessary headers, JSON.stringifies the data if it is not a string and adds it to the response.
  */
 export function jsonResponse(response: ServerResponse, data: any): void {
     response.statusCode = 200;
     response.setHeader("content-type", "application/json");
-    response.end(JSON.stringify(data));
+    if (typeof data !== "string") data = JSON.stringify(data);
+    response.end(data);
 }
 
 export function ensurePost(request: IncomingMessage, response: ServerResponse): boolean {

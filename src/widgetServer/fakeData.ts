@@ -36,7 +36,8 @@ export default function getFakeData(widgetPath: string) {
 
 interface FakeData {
     portal: {};
-    read: {};
+    read?: {};
+    api?: {};
 }
 
 function getFakeFilePath(widgetPath: string) {

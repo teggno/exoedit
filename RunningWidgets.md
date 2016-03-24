@@ -54,6 +54,10 @@ The Widget then expects a file that is in the same folder and has the same name 
                 [123457, "data value5"]
             ]
         }
+    },
+    "api": {
+        "/api/portals/v1/devices/32874n8492b74n98b37489b83n4/data-sources": [
+        ]
     }
 }
 ```
@@ -67,6 +71,8 @@ the function will return
 ```javascript
 [[123457, "data value5"]]
 ```
+
+The property `api` is a map of urls that your widget might send requests to. All requests issued by your widget that start with `/api/portals/v1` are forwarded to Exosite by default. If you want to serve your own fake data instead, you can add a key/value pair with your request's relative url (starting with `/api/portals/v1`) as key and the data that should be returned as value.
 
 #### Generating a fake data JSON file
 Exoedit can help you generate a fake data JSON file as follows:
