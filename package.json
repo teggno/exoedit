@@ -76,6 +76,7 @@
     "onep": "^0.4.1",
     "request": "^2.69.0",
     "requirejs": "^2.1.22",
+    "upath2": "^1.0.2",
     "whatwg-fetch": "^0.11.0"
   },
   "homepage": "https://github.com/teggno/exoedit",
