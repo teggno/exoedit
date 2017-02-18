@@ -2,7 +2,7 @@
   "name": "exoedit",
   "displayName": "Exoedit",
   "description": "Helps you edit and manage Exosite widget and lua scripts.",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "publisher": "teggno",
   "author": {
     "name": "Christian Bär",
