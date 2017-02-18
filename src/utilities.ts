@@ -38,5 +38,8 @@ export function arePathsEqual(path1: string, path2: string) {
     path1 = path1.indexOf(sep) === 0 && path1.length > sep.length ? path1.substr(sep.length) : path1;
     path2 = path2.indexOf(sep) === 0 && path2.length > sep.length ? path2.substr(sep.length) : path2;
 
+    path1 = path1.replace(/\\/g, '/');
+    path2 = path2.replace(/\\/g, '/');
+
     return path1 === path2;
 }
